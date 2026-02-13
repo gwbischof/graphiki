@@ -22,7 +22,7 @@ interface GraphCanvasSigmaProps {
   activeSubtypes: Map<string, Set<string>>;
   activeEdgeTypes: Set<string>;
   onNodeSelect: (node: NodeData | null) => void;
-  onEdgeSelect?: (edge: EdgeData, sourceNode: NodeData, targetNode: NodeData) => void;
+  onEdgeSelect?: (edge: EdgeData, sourceNode: NodeData, targetNode: NodeData, allPairEdges: EdgeData[]) => void;
   onNodeDoubleClick?: (nodeId: string) => void;
   config: GraphConfig;
 }
@@ -76,6 +76,50 @@ export function GraphCanvas({
 
     return g;
   }, [elements]);
+
+  // Edge coalescing: one visible edge per node pair
+  const { hiddenEdges, pairCounts, pairEdgeKeys } = useMemo(() => {
+    const pairMap = new Map<string, string[]>(); // pairKey -> edge keys
+    graph.forEachEdge((key, attrs, source, target) => {
+      const pairKey = source < target ? `${source}::${target}` : `${target}::${source}`;
+      let list = pairMap.get(pairKey);
+      if (!list) { list = []; pairMap.set(pairKey, list); }
+      list.push(key);
+    });
+
+    const hidden = new Set<string>();
+    const counts = new Map<string, number>();
+    const edgeKeys = new Map<string, string[]>(); // pairKey -> all edge keys for click lookup
+
+    for (const [pairKey, keys] of pairMap) {
+      // Separate SUMMARY edges from real edges
+      const realKeys: string[] = [];
+      const summaryKeys: string[] = [];
+      for (const k of keys) {
+        const et = graph.getEdgeAttribute(k, "edge_type") as string;
+        if (et === "SUMMARY") summaryKeys.push(k);
+        else realKeys.push(k);
+      }
+
+      edgeKeys.set(pairKey, keys);
+
+      if (realKeys.length > 0) {
+        // Pick first real edge as representative, hide the rest + all SUMMARY edges
+        const [rep, ...rest] = realKeys;
+        for (const k of rest) hidden.add(k);
+        for (const k of summaryKeys) hidden.add(k);
+        counts.set(pairKey, realKeys.length);
+        // Tag representative with pairKey for reducer lookup
+        graph.setEdgeAttribute(rep, "_pairKey", pairKey);
+      } else {
+        // Only SUMMARY edges, no real edges — hide everything
+        for (const k of summaryKeys) hidden.add(k);
+        counts.set(pairKey, 0);
+      }
+    }
+
+    return { hiddenEdges: hidden, pairCounts: counts, pairEdgeKeys: edgeKeys };
+  }, [graph]);
 
   // Compute filtered-out sets
   const filteredOutNodes = useMemo(() => {
@@ -155,11 +199,13 @@ export function GraphCanvas({
         connected: connectedEdges,
         dimmed: isDimmed,
         filteredOut: filteredOutEdges,
+        hiddenEdges,
+        pairCounts,
       };
 
       return { nodeState, edgeState };
     },
-    [graph, searchMatches, filteredOutNodes, filteredOutEdges]
+    [graph, searchMatches, filteredOutNodes, filteredOutEdges, hiddenEdges, pairCounts]
   );
 
   // Initialize Sigma
@@ -200,7 +246,7 @@ export function GraphCanvas({
       refreshReducers();
     });
 
-    // Click edge
+    // Click edge — collect all edges for the node pair
     sigma.on("clickEdge", ({ edge }) => {
       if (!onEdgeSelect) return;
       const edgeAttrs = graph.getEdgeAttributes(edge);
@@ -211,7 +257,18 @@ export function GraphCanvas({
       const edgeData = { id: edge, source, target, edge_type: edgeAttrs.edge_type || "", ...edgeAttrs } as EdgeData;
       const sourceNode = { id: source, ...sourceAttrs } as NodeData;
       const targetNode = { id: target, ...targetAttrs } as NodeData;
-      onEdgeSelect(edgeData, sourceNode, targetNode);
+
+      // Collect all edges for this node pair
+      const pairKey = source < target ? `${source}::${target}` : `${target}::${source}`;
+      const allKeys = pairEdgeKeys.get(pairKey) || [edge];
+      const allPairEdges: EdgeData[] = allKeys.map((k) => {
+        const attrs = graph.getEdgeAttributes(k);
+        const s = graph.source(k);
+        const t = graph.target(k);
+        return { id: k, source: s, target: t, edge_type: attrs.edge_type || "", ...attrs } as EdgeData;
+      });
+
+      onEdgeSelect(edgeData, sourceNode, targetNode, allPairEdges);
     });
 
     // Double-click node (expand community)

@@ -47,7 +47,8 @@
     "RELATIONSHIP":  { "color": "#d0d8f0", "label": "Relationship" },
     "DOCUMENT":      { "color": "#ffb847", "label": "Document" },
     "AFFILIATION":   { "color": "#8b95b5", "label": "Affiliation" },
-    "OWNERSHIP":     { "color": "#c4a0ff", "label": "Ownership" }
+    "OWNERSHIP":     { "color": "#c4a0ff", "label": "Ownership" },
+    "SUMMARY":       { "color": "#e0af68", "label": "Summary" }
   },
   "statusStyles": {
     "convicted":           { "color": "red",    "label": "Convicted" },

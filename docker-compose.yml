@@ -3,7 +3,7 @@ services:
     image: memgraph/memgraph-mage
     ports:
       - "7687:7687"   # Bolt protocol
-      - "3000:3000"   # Memgraph Lab web UI
+      - "3002:3000"   # Memgraph Lab web UI (remapped to avoid conflicts)
       - "7444:7444"   # Log streaming
     volumes:
       - ./memgraph-data:/var/lib/memgraph

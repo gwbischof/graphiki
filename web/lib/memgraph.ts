@@ -38,12 +38,18 @@ export async function runQuery<T = Neo4jRecord>(
   const d = getDriver();
   if (!d) throw new Error("Memgraph not configured (MEMGRAPH_URI not set)");
 
+  // Memgraph requires integer params (LIMIT, SKIP, level) as neo4j Integer type
+  const safeParams: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(params)) {
+    safeParams[k] = typeof v === "number" && Number.isInteger(v) ? neo4j.int(v) : v;
+  }
+
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const session: Session = d.session({ defaultAccessMode: neo4j.session.READ });
     try {
-      const result = await session.run(cypher, params, {
+      const result = await session.run(cypher, safeParams, {
         timeout: neo4j.int(timeout),
       });
       return result.records as unknown as T[];
@@ -74,9 +80,14 @@ export async function writeQuery<T = Neo4jRecord>(
   const d = getDriver();
   if (!d) throw new Error("Memgraph not configured (MEMGRAPH_URI not set)");
 
+  const safeParams: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(params)) {
+    safeParams[k] = typeof v === "number" && Number.isInteger(v) ? neo4j.int(v) : v;
+  }
+
   const session: Session = d.session({ defaultAccessMode: neo4j.session.WRITE });
   try {
-    const result = await session.run(cypher, params, {
+    const result = await session.run(cypher, safeParams, {
       timeout: neo4j.int(timeout),
     });
     return result.records as unknown as T[];

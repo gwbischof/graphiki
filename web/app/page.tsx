@@ -54,6 +54,7 @@ export default function Home() {
   const [selectedEdge, setSelectedEdge] = useState<EdgeData | null>(null);
   const [selectedEdgeSource, setSelectedEdgeSource] = useState<NodeData | null>(null);
   const [selectedEdgeTarget, setSelectedEdgeTarget] = useState<NodeData | null>(null);
+  const [selectedPairEdges, setSelectedPairEdges] = useState<EdgeData[]>([]);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -101,15 +102,17 @@ export default function Home() {
       setSelectedEdge(null);
       setSelectedEdgeSource(null);
       setSelectedEdgeTarget(null);
+      setSelectedPairEdges([]);
     },
     []
   );
 
   const handleEdgeSelect = useCallback(
-    (edge: EdgeData, sourceNode: NodeData, targetNode: NodeData) => {
+    (edge: EdgeData, sourceNode: NodeData, targetNode: NodeData, allPairEdges: EdgeData[]) => {
       setSelectedEdge(edge);
       setSelectedEdgeSource(sourceNode);
       setSelectedEdgeTarget(targetNode);
+      setSelectedPairEdges(allPairEdges);
       // Close detail panel when an edge is clicked
       setSelectedNode(null);
     },
@@ -160,6 +163,7 @@ export default function Home() {
     setSelectedEdge(null);
     setSelectedEdgeSource(null);
     setSelectedEdgeTarget(null);
+    setSelectedPairEdges([]);
   }, [config]);
 
   const handleCloseDetail = useCallback(() => {
@@ -170,6 +174,7 @@ export default function Home() {
     setSelectedEdge(null);
     setSelectedEdgeSource(null);
     setSelectedEdgeTarget(null);
+    setSelectedPairEdges([]);
   }, []);
 
   const handleSaveView = useCallback(
@@ -337,7 +342,7 @@ export default function Home() {
         edge={selectedEdge}
         sourceNode={selectedEdgeSource}
         targetNode={selectedEdgeTarget}
-        elements={graphView.elements}
+        allPairEdges={selectedPairEdges}
         onClose={handleCloseConnections}
         config={config}
       />

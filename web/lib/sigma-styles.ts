@@ -72,6 +72,8 @@ export type EdgeState = {
   connected: Set<string>;
   dimmed: boolean;
   filteredOut: Set<string>;
+  hiddenEdges: Set<string>;
+  pairCounts: Map<string, number>;
 };
 
 export function createNodeReducer(config: GraphConfig, nodeState: NodeState) {
@@ -140,13 +142,41 @@ export function createNodeReducer(config: GraphConfig, nodeState: NodeState) {
 
 export function createEdgeReducer(config: GraphConfig, edgeState: EdgeState) {
   return (_edge: string, data: Attributes): SigmaEdgeDisplayData => {
+    // Hidden by coalescing — hide non-representative edges
+    if (edgeState.hiddenEdges.has(_edge)) {
+      return { size: 0, color: "rgba(0,0,0,0)", hidden: true };
+    }
+
     const edgeType = data.edge_type as string;
     const etConfig = config.edgeTypes[edgeType];
-    const color = etConfig?.color || config.defaultEdgeColor;
+    const baseColor = etConfig?.color || config.defaultEdgeColor;
+
+    // Determine if this is a coalesced representative edge
+    const pairKey = data._pairKey as string | undefined;
+    const count = pairKey ? (edgeState.pairCounts.get(pairKey) ?? 1) : 1;
+
+    // Heat-scale: color, size, alpha by connection count
+    let color: string;
+    let size: number;
+    let alpha: number;
+
+    if (count >= 5) {
+      color = "#f7768e"; // hot red-pink
+      size = 4;
+      alpha = 0.95;
+    } else if (count >= 2) {
+      color = "#e0af68"; // warm amber
+      size = 2.5;
+      alpha = 0.75;
+    } else {
+      color = baseColor; // default
+      size = 1.5;
+      alpha = 0.5;
+    }
 
     const result: SigmaEdgeDisplayData = {
-      size: 1.5,
-      color: adjustAlpha(color, 0.65),
+      size,
+      color: adjustAlpha(color, alpha),
     };
 
     if (edgeState.filteredOut.has(_edge)) {
@@ -154,8 +184,9 @@ export function createEdgeReducer(config: GraphConfig, edgeState: EdgeState) {
       return result;
     }
 
+    // Selection highlighting overrides heat scale
     if (edgeState.connected.has(_edge)) {
-      result.size = 3;
+      result.size = Math.max(size, 3);
       result.color = adjustAlpha(color, 0.95);
     } else if (edgeState.dimmed) {
       result.color = adjustAlpha(color, 0.12);
