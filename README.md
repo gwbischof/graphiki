@@ -2,6 +2,9 @@
 
 Graphoni is a graph-based wiki web app. It lets teams build, explore, and curate knowledge graphs through a browser — the same way a traditional wiki lets you collaboratively edit text. It's not tied to any specific domain: anything that makes sense as a graph — people and relationships, infrastructure dependencies, research citations, corporate ownership structures — can be a Graphoni wiki.
 
+<img width="1709" height="981" alt="image" src="https://github.com/user-attachments/assets/dc0f4f2c-aa4e-4664-971d-6995583aa4d3" />
+
+
 ## How it works
 
 The graph is stored in Memgraph (a Cypher-compatible graph database) and rendered in real-time with Sigma.js over WebGL. Nodes and edges are color-coded by type, laid out with ForceAtlas2, and organized into communities you can zoom into. Click any node to see its properties, connections, and linked documents.
