@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Epstein Network Graph</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+}
+
+#cy {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+}
+
+/* --- Controls panel (top-left) --- */
+#controls {
+    position: absolute;
+    top: 12px; left: 12px;
+    z-index: 10;
+    background: rgba(15, 15, 25, 0.92);
+    border: 1px solid #2a2a3a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    width: 260px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+}
+
+#controls h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+#controls h3 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 12px 0 6px;
+}
+
+#search {
+    width: 100%;
+    padding: 7px 10px;
+    background: #1a1a2a;
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+}
+#search:focus { border-color: #5588ff; }
+#search::placeholder { color: #555; }
+
+.filter-group { margin-bottom: 4px; }
+
+.filter-group label {
+    display: flex;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-group label:hover { color: #fff; }
+
+.filter-group input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #5588ff;
+}
+
+.color-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+.btn-row { display: flex; gap: 6px; margin-top: 8px; }
+
+.btn {
+    flex: 1;
+    padding: 6px 0;
+    background: #1e1e30;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+}
+.btn:hover { background: #2a2a40; color: #fff; }
+
+/* --- Detail panel (right side) --- */
+#detail {
+    position: absolute;
+    top: 12px; right: 12px;
+    z-index: 10;
+    background: rgba(15, 15, 25, 0.95);
+    border: 1px solid #2a2a3a;
+    border-radius: 8px;
+    padding: 16px;
+    width: 340px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+    display: none;
+}
+
+#detail.visible { display: block; }
+
+#detail-close {
+    position: absolute;
+    top: 8px; right: 12px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 18px;
+    cursor: pointer;
+}
+#detail-close:hover { color: #fff; }
+
+#detail h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    padding-right: 24px;
+}
+
+#detail-meta {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 12px;
+}
+
+.detail-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 4px;
+}
+
+#detail-notes {
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+#detail-edges h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 10px 0 6px;
+}
+
+.edge-item {
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    background: #141420;
+    border-radius: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+    border-left: 3px solid #333;
+}
+
+.edge-item.money { border-left-color: #44bb66; }
+.edge-item.communication { border-left-color: #4488ff; }
+.edge-item.document { border-left-color: #ff8844; }
+.edge-item.relationship { border-left-color: #888; }
+.edge-item.affiliation { border-left-color: #aa66dd; }
+.edge-item.ownership { border-left-color: #44bbbb; }
+
+.edge-item .edge-type {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+}
+
+.edge-item .edge-target { color: #ddd; }
+.edge-item .edge-desc { color: #999; margin-top: 2px; }
+.edge-item .edge-quote {
+    color: #cc8844;
+    font-style: italic;
+    margin-top: 2px;
+}
+
+.edge-item a {
+    color: #5588ff;
+    text-decoration: none;
+    font-size: 10px;
+}
+.edge-item a:hover { text-decoration: underline; }
+
+/* --- Legend (bottom-left) --- */
+#legend {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    z-index: 10;
+    background: rgba(15, 15, 25, 0.88);
+    border: 1px solid #2a2a3a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    backdrop-filter: blur(10px);
+}
+
+#legend h3 {
+    font-size: 10px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.legend-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    color: #999;
+}
+
+.legend-line {
+    width: 18px;
+    height: 3px;
+    border-radius: 2px;
+    margin-right: 5px;
+}
+
+/* --- Stats (bottom-right) --- */
+#stats {
+    position: absolute;
+    bottom: 12px; right: 12px;
+    z-index: 10;
+    font-size: 10px;
+    color: #444;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="cy"></div>
+
+<!-- Controls -->
+<div id="controls">
+    <h2>Epstein Network</h2>
+    <input type="text" id="search" placeholder="Search names..." autocomplete="off">
+
+    <h3>Edge Types</h3>
+    <div class="filter-group" id="edge-filters">
+        <label><input type="checkbox" data-edge="MONEY" checked>
+            <span class="color-dot" style="background:#44bb66"></span>Money</label>
+        <label><input type="checkbox" data-edge="COMMUNICATION" checked>
+            <span class="color-dot" style="background:#4488ff"></span>Communication</label>
+        <label><input type="checkbox" data-edge="DOCUMENT" checked>
+            <span class="color-dot" style="background:#ff8844"></span>Document</label>
+        <label><input type="checkbox" data-edge="RELATIONSHIP" checked>
+            <span class="color-dot" style="background:#888888"></span>Relationship</label>
+        <label><input type="checkbox" data-edge="AFFILIATION" checked>
+            <span class="color-dot" style="background:#aa66dd"></span>Affiliation</label>
+        <label><input type="checkbox" data-edge="OWNERSHIP" checked>
+            <span class="color-dot" style="background:#44bbbb"></span>Ownership</label>
+    </div>
+
+    <h3>Person Roles</h3>
+    <div class="filter-group" id="role-filters">
+        <label><input type="checkbox" data-role="principal" checked>
+            <span class="color-dot" style="background:#ff2222"></span>Principal</label>
+        <label><input type="checkbox" data-role="co-conspirator" checked>
+            <span class="color-dot" style="background:#ff4466"></span>Co-Conspirator</label>
+        <label><input type="checkbox" data-role="recruiter" checked>
+            <span class="color-dot" style="background:#ff8800"></span>Recruiter</label>
+        <label><input type="checkbox" data-role="staff" checked>
+            <span class="color-dot" style="background:#777777"></span>Staff</label>
+        <label><input type="checkbox" data-role="associate" checked>
+            <span class="color-dot" style="background:#4488cc"></span>Associate</label>
+        <label><input type="checkbox" data-role="financier" checked>
+            <span class="color-dot" style="background:#44bb66"></span>Financier</label>
+        <label><input type="checkbox" data-role="victim-identified" checked>
+            <span class="color-dot" style="background:#dddd44"></span>Victim</label>
+        <label><input type="checkbox" data-role="external-predator" checked>
+            <span class="color-dot" style="background:#aa22cc"></span>External Predator</label>
+    </div>
+
+    <h3>Organizations</h3>
+    <div class="filter-group" id="org-filters">
+        <label><input type="checkbox" data-org="all" checked>
+            <span class="color-dot" style="background:#666"></span>Show Organizations</label>
+    </div>
+
+    <div class="btn-row">
+        <div class="btn" id="btn-fit">Fit View</div>
+        <div class="btn" id="btn-reset">Reset</div>
+    </div>
+</div>
+
+<!-- Detail panel -->
+<div id="detail">
+    <button id="detail-close">&times;</button>
+    <h2 id="detail-name"></h2>
+    <div id="detail-meta"></div>
+    <div id="detail-notes"></div>
+    <div id="detail-edges"></div>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+    <h3>Edge Types</h3>
+    <div class="legend-row">
+        <div class="legend-item"><div class="legend-line" style="background:#44bb66"></div>Money</div>
+        <div class="legend-item"><div class="legend-line" style="background:#4488ff"></div>Communication</div>
+        <div class="legend-item"><div class="legend-line" style="background:#ff8844"></div>Document</div>
+        <div class="legend-item"><div class="legend-line" style="background:#888"></div>Relationship</div>
+        <div class="legend-item"><div class="legend-line" style="background:#aa66dd"></div>Affiliation</div>
+        <div class="legend-item"><div class="legend-line" style="background:#44bbbb"></div>Ownership</div>
+    </div>
+</div>
+
+<div id="stats"></div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Data (injected by Jinja2)
+// ---------------------------------------------------------------------------
+const elements = {{ elements_json }};
+
+// ---------------------------------------------------------------------------
+// Color maps
+// ---------------------------------------------------------------------------
+const ROLE_COLORS = {
+    'principal':         '#ff2222',
+    'co-conspirator':    '#ff4466',
+    'recruiter':         '#ff8800',
+    'staff':             '#777777',
+    'associate':         '#4488cc',
+    'financier':         '#44bb66',
+    'victim-identified': '#dddd44',
+    'external-predator': '#aa22cc',
+};
+
+const ORG_TYPE_COLORS = {
+    'modeling-agency': '#dd66aa',
+    'financial':       '#44bbaa',
+    'property':        '#aa8844',
+    'foundation':      '#4466cc',
+    'company':         '#888888',
+    'government':      '#cc4444',
+    'law-firm':        '#999999',
+};
+
+const EDGE_COLORS = {
+    'MONEY':         '#44bb66',
+    'COMMUNICATION': '#4488ff',
+    'DOCUMENT':      '#ff8844',
+    'RELATIONSHIP':  '#888888',
+    'AFFILIATION':   '#aa66dd',
+    'OWNERSHIP':     '#44bbbb',
+};
+
+const STATUS_COLORS = {
+    'convicted':          '#ff4444',
+    'deceased':           '#666',
+    'charged':            '#ff8844',
+    'under-investigation':'#ddaa44',
+    'not-charged':        '#4488cc',
+};
+
+// ---------------------------------------------------------------------------
+// Initialize Cytoscape
+// ---------------------------------------------------------------------------
+const cy = cytoscape({
+    container: document.getElementById('cy'),
+    elements: elements,
+    style: [
+        // --- Person nodes ---
+        {
+            selector: 'node[node_type="Person"]',
+            style: {
+                'label': 'data(label)',
+                'font-size': 9,
+                'color': '#ccc',
+                'text-valign': 'bottom',
+                'text-margin-y': 4,
+                'text-outline-color': '#0a0a0f',
+                'text-outline-width': 2,
+                'background-color': function(ele) {
+                    return ROLE_COLORS[ele.data('role')] || '#555';
+                },
+                'width': function(ele) {
+                    return Math.max(16, Math.min(60, 8 + Math.log2(ele.data('doc_count') || 1) * 4));
+                },
+                'height': function(ele) {
+                    return Math.max(16, Math.min(60, 8 + Math.log2(ele.data('doc_count') || 1) * 4));
+                },
+                'border-width': function(ele) {
+                    const s = ele.data('status');
+                    return (s === 'convicted' || s === 'charged' || s === 'under-investigation') ? 3 : 1;
+                },
+                'border-color': function(ele) {
+                    return STATUS_COLORS[ele.data('status')] || '#333';
+                },
+            }
+        },
+        // --- Organization nodes ---
+        {
+            selector: 'node[node_type="Organization"]',
+            style: {
+                'label': 'data(label)',
+                'font-size': 8,
+                'color': '#999',
+                'text-valign': 'bottom',
+                'text-margin-y': 4,
+                'text-outline-color': '#0a0a0f',
+                'text-outline-width': 2,
+                'shape': 'diamond',
+                'background-color': function(ele) {
+                    return ORG_TYPE_COLORS[ele.data('org_type')] || '#555';
+                },
+                'width': function(ele) {
+                    return Math.max(14, Math.min(40, 6 + Math.log2(ele.data('doc_count') || 1) * 3));
+                },
+                'height': function(ele) {
+                    return Math.max(14, Math.min(40, 6 + Math.log2(ele.data('doc_count') || 1) * 3));
+                },
+                'border-width': 1,
+                'border-color': '#333',
+            }
+        },
+        // --- Edges ---
+        {
+            selector: 'edge',
+            style: {
+                'width': 1.5,
+                'line-color': function(ele) {
+                    return EDGE_COLORS[ele.data('edge_type')] || '#444';
+                },
+                'target-arrow-color': function(ele) {
+                    return EDGE_COLORS[ele.data('edge_type')] || '#444';
+                },
+                'target-arrow-shape': 'triangle',
+                'arrow-scale': 0.7,
+                'curve-style': 'bezier',
+                'opacity': 0.5,
+            }
+        },
+        // --- MONEY edges thicker based on amount ---
+        {
+            selector: 'edge[edge_type="MONEY"]',
+            style: {
+                'width': function(ele) {
+                    const amt = ele.data('amount') || 0;
+                    if (amt >= 100000000) return 5;
+                    if (amt >= 10000000) return 3.5;
+                    if (amt >= 1000000) return 2.5;
+                    return 1.5;
+                },
+            }
+        },
+        // --- Highlighted state ---
+        {
+            selector: '.highlighted',
+            style: {
+                'opacity': 1,
+                'z-index': 100,
+            }
+        },
+        {
+            selector: 'node.highlighted',
+            style: {
+                'border-width': 3,
+                'border-color': '#ffcc00',
+                'font-size': 12,
+                'color': '#fff',
+                'text-outline-width': 3,
+            }
+        },
+        {
+            selector: '.dimmed',
+            style: {
+                'opacity': 0.08,
+            }
+        },
+        // --- Search match ---
+        {
+            selector: '.search-match',
+            style: {
+                'border-width': 3,
+                'border-color': '#ffcc00',
+                'color': '#fff',
+                'font-size': 12,
+            }
+        },
+    ],
+    layout: {
+        name: 'cose',
+        idealEdgeLength: 120,
+        nodeRepulsion: 8000,
+        gravity: 0.3,
+        numIter: 500,
+        animate: false,
+    },
+    wheelSensitivity: 0.3,
+    minZoom: 0.1,
+    maxZoom: 5,
+});
+
+// ---------------------------------------------------------------------------
+// Stats
+// ---------------------------------------------------------------------------
+const personCount = cy.nodes('[node_type="Person"]').length;
+const orgCount = cy.nodes('[node_type="Organization"]').length;
+const edgeCount = cy.edges().length;
+document.getElementById('stats').textContent =
+    `${personCount} persons · ${orgCount} orgs · ${edgeCount} edges`;
+
+// ---------------------------------------------------------------------------
+// Search
+// ---------------------------------------------------------------------------
+const searchInput = document.getElementById('search');
+let searchTimeout;
+
+searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(doSearch, 200);
+});
+
+function doSearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    cy.elements().removeClass('search-match dimmed');
+
+    if (!q) return;
+
+    const matched = cy.nodes().filter(n =>
+        (n.data('label') || '').toLowerCase().includes(q) ||
+        (n.data('id') || '').toLowerCase().includes(q) ||
+        (n.data('notes') || '').toLowerCase().includes(q)
+    );
+
+    if (matched.length > 0) {
+        cy.elements().addClass('dimmed');
+        matched.removeClass('dimmed').addClass('search-match');
+        matched.connectedEdges().removeClass('dimmed');
+        matched.connectedEdges().connectedNodes().removeClass('dimmed');
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Edge type filters
+// ---------------------------------------------------------------------------
+document.querySelectorAll('#edge-filters input').forEach(cb => {
+    cb.addEventListener('change', applyFilters);
+});
+
+// ---------------------------------------------------------------------------
+// Role filters
+// ---------------------------------------------------------------------------
+document.querySelectorAll('#role-filters input').forEach(cb => {
+    cb.addEventListener('change', applyFilters);
+});
+
+// ---------------------------------------------------------------------------
+// Org filter
+// ---------------------------------------------------------------------------
+document.querySelectorAll('#org-filters input').forEach(cb => {
+    cb.addEventListener('change', applyFilters);
+});
+
+function applyFilters() {
+    // Edge type visibility
+    const visibleEdgeTypes = new Set();
+    document.querySelectorAll('#edge-filters input:checked').forEach(cb => {
+        visibleEdgeTypes.add(cb.dataset.edge);
+    });
+    cy.edges().forEach(e => {
+        if (visibleEdgeTypes.has(e.data('edge_type'))) {
+            e.style('display', 'element');
+        } else {
+            e.style('display', 'none');
+        }
+    });
+
+    // Role visibility
+    const visibleRoles = new Set();
+    document.querySelectorAll('#role-filters input:checked').forEach(cb => {
+        visibleRoles.add(cb.dataset.role);
+    });
+    cy.nodes('[node_type="Person"]').forEach(n => {
+        if (visibleRoles.has(n.data('role'))) {
+            n.style('display', 'element');
+        } else {
+            n.style('display', 'none');
+        }
+    });
+
+    // Org visibility
+    const showOrgs = document.querySelector('#org-filters input[data-org="all"]').checked;
+    cy.nodes('[node_type="Organization"]').forEach(n => {
+        n.style('display', showOrgs ? 'element' : 'none');
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Node click → detail panel
+// ---------------------------------------------------------------------------
+const detailPanel = document.getElementById('detail');
+const detailName = document.getElementById('detail-name');
+const detailMeta = document.getElementById('detail-meta');
+const detailNotes = document.getElementById('detail-notes');
+const detailEdges = document.getElementById('detail-edges');
+
+cy.on('tap', 'node', function(evt) {
+    const node = evt.target;
+    const d = node.data();
+
+    detailName.textContent = d.label;
+
+    // Build meta badges
+    let meta = '';
+    if (d.node_type === 'Person') {
+        const roleColor = ROLE_COLORS[d.role] || '#555';
+        meta += `<span class="detail-badge" style="background:${roleColor};color:#fff">${d.role || 'unknown'}</span>`;
+        if (d.status) {
+            const sColor = STATUS_COLORS[d.status] || '#555';
+            meta += `<span class="detail-badge" style="background:${sColor};color:#fff">${d.status}</span>`;
+        }
+        if (d.doc_count) meta += ` · ${d.doc_count.toLocaleString()} docs`;
+        if (d.network) meta += ` · ${d.network}`;
+    } else {
+        const orgColor = ORG_TYPE_COLORS[d.org_type] || '#555';
+        meta += `<span class="detail-badge" style="background:${orgColor};color:#fff">${d.org_type || 'org'}</span>`;
+        if (d.status) meta += `<span class="detail-badge" style="background:#555;color:#ccc">${d.status}</span>`;
+        if (d.doc_count) meta += ` · ${d.doc_count.toLocaleString()} docs`;
+    }
+    detailMeta.innerHTML = meta;
+
+    detailNotes.textContent = d.notes || '';
+
+    // Build edge list
+    const edges = node.connectedEdges();
+    let edgeHtml = '';
+    const byType = {};
+    edges.forEach(e => {
+        const type = e.data('edge_type');
+        if (!byType[type]) byType[type] = [];
+        byType[type].push(e);
+    });
+
+    for (const [type, edgeList] of Object.entries(byType)) {
+        edgeHtml += `<h3>${type} (${edgeList.length})</h3>`;
+        for (const e of edgeList) {
+            const ed = e.data();
+            const other = e.source().data('id') === d.id
+                ? e.target().data('label')
+                : e.source().data('label');
+            const dir = e.source().data('id') === d.id ? '→' : '←';
+
+            let itemHtml = `<div class="edge-item ${type.toLowerCase()}">`;
+            itemHtml += `<div class="edge-target">${dir} ${other}</div>`;
+
+            if (ed.amount) {
+                const fmt = ed.amount >= 1000000
+                    ? `$${(ed.amount / 1000000).toFixed(1)}M`
+                    : `$${ed.amount.toLocaleString()}`;
+                itemHtml += `<div class="edge-desc">${fmt}${ed.date ? ' (' + ed.date + ')' : ''}</div>`;
+            }
+            if (ed.description) itemHtml += `<div class="edge-desc">${ed.description}</div>`;
+            if (ed.quote) itemHtml += `<div class="edge-quote">"${ed.quote}"</div>`;
+            if (ed.doc_url) {
+                itemHtml += `<div><a href="${ed.doc_url}" target="_blank">${ed.source_doc || ed.doc_id || 'View DOJ PDF'}</a></div>`;
+            }
+            itemHtml += '</div>';
+            edgeHtml += itemHtml;
+        }
+    }
+    detailEdges.innerHTML = edgeHtml;
+
+    // Highlight selected node + neighbors
+    cy.elements().removeClass('highlighted dimmed');
+    cy.elements().addClass('dimmed');
+    node.removeClass('dimmed').addClass('highlighted');
+    node.connectedEdges().forEach(e => {
+        if (e.style('display') !== 'none') {
+            e.removeClass('dimmed').addClass('highlighted');
+            e.connectedNodes().removeClass('dimmed');
+        }
+    });
+
+    detailPanel.classList.add('visible');
+});
+
+// Click background → close detail
+cy.on('tap', function(evt) {
+    if (evt.target === cy) {
+        detailPanel.classList.remove('visible');
+        cy.elements().removeClass('highlighted dimmed search-match');
+    }
+});
+
+document.getElementById('detail-close').addEventListener('click', function() {
+    detailPanel.classList.remove('visible');
+    cy.elements().removeClass('highlighted dimmed search-match');
+});
+
+// ---------------------------------------------------------------------------
+// Edge click → detail
+// ---------------------------------------------------------------------------
+cy.on('tap', 'edge', function(evt) {
+    const e = evt.target;
+    const ed = e.data();
+
+    detailName.textContent = `${ed.edge_type}`;
+
+    const src = e.source().data('label');
+    const tgt = e.target().data('label');
+    detailMeta.innerHTML = `<span style="color:#999">${src} → ${tgt}</span>`;
+
+    let notes = '';
+    if (ed.amount) {
+        const fmt = ed.amount >= 1000000
+            ? `$${(ed.amount / 1000000).toFixed(1)}M`
+            : `$${ed.amount.toLocaleString()}`;
+        notes += `<strong>Amount:</strong> ${fmt}<br>`;
+    }
+    if (ed.date) notes += `<strong>Date:</strong> ${ed.date}<br>`;
+    if (ed.channel) notes += `<strong>Channel:</strong> ${ed.channel}<br>`;
+    if (ed.description) notes += `${ed.description}<br>`;
+    if (ed.quote) notes += `<br><em style="color:#cc8844">"${ed.quote}"</em><br>`;
+    if (ed.doc_url) {
+        notes += `<br><a href="${ed.doc_url}" target="_blank" style="color:#5588ff">${ed.source_doc || ed.doc_id || 'View DOJ PDF'}</a>`;
+    }
+    detailNotes.innerHTML = notes;
+    detailEdges.innerHTML = '';
+
+    detailPanel.classList.add('visible');
+});
+
+// ---------------------------------------------------------------------------
+// Buttons
+// ---------------------------------------------------------------------------
+document.getElementById('btn-fit').addEventListener('click', () => cy.fit(null, 30));
+
+document.getElementById('btn-reset').addEventListener('click', function() {
+    // Reset all filters
+    document.querySelectorAll('#controls input[type="checkbox"]').forEach(cb => cb.checked = true);
+    searchInput.value = '';
+    cy.elements().removeClass('highlighted dimmed search-match');
+    applyFilters();
+    cy.fit(null, 30);
+});
+
+// ---------------------------------------------------------------------------
+// Keyboard shortcuts
+// ---------------------------------------------------------------------------
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        detailPanel.classList.remove('visible');
+        cy.elements().removeClass('highlighted dimmed search-match');
+        searchInput.value = '';
+    }
+    if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+    }
+});
+</script>
+</body>
+</html>

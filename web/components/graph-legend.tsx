@@ -1,0 +1,97 @@
+"use client";
+
+import { motion } from "framer-motion";
+import type { GraphConfig } from "@/lib/graph-config";
+
+interface GraphLegendProps {
+  config: GraphConfig;
+}
+
+/** Render an SVG shape icon for a Cytoscape shape name */
+function ShapeIcon({ shape }: { shape: string }) {
+  if (shape === "diamond") {
+    return <span className="size-2 rotate-45 bg-muted-foreground/40" />;
+  }
+  if (shape === "hexagon") {
+    return (
+      <svg width="10" height="10" viewBox="0 0 10 10">
+        <polygon
+          points="5,0 9.33,2.5 9.33,7.5 5,10 0.67,7.5 0.67,2.5"
+          fill="currentColor"
+          className="text-muted-foreground/40"
+        />
+      </svg>
+    );
+  }
+  // Default: ellipse → circle
+  return <span className="size-2 rounded-full bg-muted-foreground/40" />;
+}
+
+export function GraphLegend({ config }: GraphLegendProps) {
+  // Build a flat list of all subtypes across all node types for the role legend
+  const allSubtypes = Object.values(config.nodeTypes).flatMap((nt) =>
+    Object.entries(nt.subtypes).map(([key, style]) => ({
+      key,
+      color: style.color,
+      label: style.label || key,
+    }))
+  );
+
+  return (
+    <motion.div
+      initial={{ y: 40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", damping: 28, stiffness: 200, delay: 0.4 }}
+      className="glass-panel absolute bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-xl px-4 py-2.5 flex items-center gap-5"
+    >
+      {/* Node subtypes */}
+      <div className="flex items-center gap-3">
+        <span className="text-[9px] font-mono tracking-widest text-muted-foreground uppercase mr-1">
+          Types
+        </span>
+        {allSubtypes.map(({ key, color, label }) => (
+          <div key={key} className="flex items-center gap-1.5">
+            <span
+              className="size-2 rounded-full"
+              style={{ backgroundColor: color }}
+            />
+            <span className="text-[10px] text-muted-foreground">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="w-px h-4 bg-white/10" />
+
+      {/* Edge types */}
+      <div className="flex items-center gap-3">
+        <span className="text-[9px] font-mono tracking-widest text-muted-foreground uppercase mr-1">
+          Edges
+        </span>
+        {Object.entries(config.edgeTypes).map(([key, etConfig]) => (
+          <div key={key} className="flex items-center gap-1.5">
+            <span
+              className="w-3 h-px"
+              style={{ backgroundColor: etConfig.color }}
+            />
+            <span className="text-[10px] text-muted-foreground">{etConfig.label || key}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="w-px h-4 bg-white/10" />
+
+      {/* Shape legend — derived from config */}
+      <div className="flex items-center gap-1.5">
+        <span className="text-[9px] font-mono tracking-widest text-muted-foreground uppercase mr-1">
+          Shape
+        </span>
+        {Object.entries(config.nodeTypes).map(([typeName, ntConfig]) => (
+          <div key={typeName} className="flex items-center gap-1.5 ml-2 first:ml-0">
+            <ShapeIcon shape={ntConfig.shape} />
+            <span className="text-[10px] text-muted-foreground">{typeName}</span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}

@@ -1,0 +1,93 @@
+// Singleton neo4j-driver wrapper for Memgraph
+// Server-only — never import from client components
+
+import neo4j, { Driver, Session, Record as Neo4jRecord } from "neo4j-driver";
+
+let driver: Driver | null = null;
+
+export function getDriver(): Driver | null {
+  const uri = process.env.MEMGRAPH_URI;
+  if (!uri) return null;
+
+  if (!driver) {
+    driver = neo4j.driver(uri, neo4j.auth.basic("", ""), {
+      maxConnectionPoolSize: 50,
+      connectionAcquisitionTimeout: 30000,
+      maxTransactionRetryTime: 15000,
+    });
+  }
+  return driver;
+}
+
+export function isMemgraphAvailable(): boolean {
+  return !!process.env.MEMGRAPH_URI;
+}
+
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 500;
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function runQuery<T = Neo4jRecord>(
+  cypher: string,
+  params: Record<string, unknown> = {},
+  timeout = 30000
+): Promise<T[]> {
+  const d = getDriver();
+  if (!d) throw new Error("Memgraph not configured (MEMGRAPH_URI not set)");
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const session: Session = d.session({ defaultAccessMode: neo4j.session.READ });
+    try {
+      const result = await session.run(cypher, params, {
+        timeout: neo4j.int(timeout),
+      });
+      return result.records as unknown as T[];
+    } catch (error) {
+      lastError = error as Error;
+      // Only retry on connection errors, not query errors
+      const msg = String(error);
+      if (msg.includes("connection") || msg.includes("timeout") || msg.includes("ECONNREFUSED")) {
+        if (attempt < MAX_RETRIES) {
+          await sleep(RETRY_DELAY_MS * (attempt + 1));
+          continue;
+        }
+      }
+      throw error;
+    } finally {
+      await session.close();
+    }
+  }
+
+  throw lastError || new Error("Query failed after retries");
+}
+
+export async function writeQuery<T = Neo4jRecord>(
+  cypher: string,
+  params: Record<string, unknown> = {},
+  timeout = 30000
+): Promise<T[]> {
+  const d = getDriver();
+  if (!d) throw new Error("Memgraph not configured (MEMGRAPH_URI not set)");
+
+  const session: Session = d.session({ defaultAccessMode: neo4j.session.WRITE });
+  try {
+    const result = await session.run(cypher, params, {
+      timeout: neo4j.int(timeout),
+    });
+    return result.records as unknown as T[];
+  } finally {
+    await session.close();
+  }
+}
+
+export async function closeDriver(): Promise<void> {
+  if (driver) {
+    await driver.close();
+    driver = null;
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "nodeTypes": {
+    "Person": {
+      "shape": "ellipse",
+      "sizeMultiplier": 1.0,
+      "subtypeField": "role",
+      "subtypes": {
+        "principal":         { "color": "#ff4444", "label": "Principal" },
+        "co-conspirator":    { "color": "#7aa2f7", "label": "Co-Conspirator" },
+        "recruiter":         { "color": "#e0af68", "label": "Recruiter" },
+        "financier":         { "color": "#9ece6a", "label": "Financier" },
+        "associate":         { "color": "#89ddff", "label": "Associate" },
+        "staff":             { "color": "#737aa2", "label": "Staff" },
+        "external-predator": { "color": "#f7768e", "label": "External Predator" },
+        "victim-identified": { "color": "#bb9af7", "label": "Victim Identified" }
+      },
+      "defaultColor": "#565f89"
+    },
+    "Organization": {
+      "shape": "diamond",
+      "sizeMultiplier": 0.9,
+      "subtypeField": "org_type",
+      "subtypes": {
+        "financial":        { "color": "#9ece6a", "label": "Financial" },
+        "company":          { "color": "#7aa2f7", "label": "Company" },
+        "foundation":       { "color": "#bb9af7", "label": "Foundation" },
+        "modeling-agency":  { "color": "#e0af68", "label": "Modeling Agency" }
+      },
+      "defaultColor": "#565f89"
+    },
+    "Location": {
+      "shape": "hexagon",
+      "sizeMultiplier": 0.85,
+      "subtypeField": "location_type",
+      "subtypes": {
+        "residence": { "color": "#ff9e64", "label": "Residence" },
+        "island":    { "color": "#2ac3de", "label": "Island" },
+        "office":    { "color": "#73daca", "label": "Office" },
+        "club":      { "color": "#e0af68", "label": "Club" }
+      },
+      "defaultColor": "#ff9e64"
+    }
+  },
+  "edgeTypes": {
+    "MONEY":         { "color": "#9ece6a", "label": "Money" },
+    "COMMUNICATION": { "color": "#7aa2f7", "label": "Communication" },
+    "RELATIONSHIP":  { "color": "#c0caf5", "label": "Relationship" },
+    "DOCUMENT":      { "color": "#e0af68", "label": "Document" },
+    "AFFILIATION":   { "color": "#737aa2", "label": "Affiliation" },
+    "OWNERSHIP":     { "color": "#bb9af7", "label": "Ownership" }
+  },
+  "statusStyles": {
+    "convicted":           { "color": "red",    "label": "Convicted" },
+    "charged":             { "color": "orange", "label": "Charged" },
+    "under-investigation": { "color": "yellow", "label": "Under Investigation" },
+    "not-charged":         { "color": "zinc",   "label": "Not Charged" },
+    "deceased":            { "color": "purple", "label": "Deceased" },
+    "dissolved":           { "color": "zinc",   "label": "Dissolved" },
+    "seized":              { "color": "red",    "label": "Seized" },
+    "active":              { "color": "green",  "label": "Active" }
+  },
+  "defaultEdgeColor": "#565f89"
+}

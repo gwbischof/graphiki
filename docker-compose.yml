@@ -1,0 +1,62 @@
+services:
+  memgraph:
+    image: memgraph/memgraph-mage
+    ports:
+      - "7687:7687"   # Bolt protocol
+      - "3000:3000"   # Memgraph Lab web UI
+      - "7444:7444"   # Log streaming
+    volumes:
+      - ./memgraph-data:/var/lib/memgraph
+    command: ["--storage-properties-on-edges=true", "--memory-limit=48000"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mgconsole", "--host", "127.0.0.1", "--port", "7687", "-e", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: graphiki
+      POSTGRES_PASSWORD: graphiki_dev
+      POSTGRES_DB: graphiki
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U graphiki"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: ./web
+    ports:
+      - "3001:3001"
+    environment:
+      MEMGRAPH_URI: bolt://memgraph:7687
+      DATABASE_URL: postgresql://graphiki:graphiki_dev@postgres:5432/graphiki
+      NEXTAUTH_URL: http://localhost:3001
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-secret-change-in-production}
+      GITHUB_ID: ${GITHUB_ID:-}
+      GITHUB_SECRET: ${GITHUB_SECRET:-}
+      PORT: "3001"
+    depends_on:
+      memgraph:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  analytics:
+    build: ./analytics
+    environment:
+      MEMGRAPH_URI: bolt://memgraph:7687
+    depends_on:
+      memgraph:
+        condition: service_healthy
+    profiles:
+      - analytics
