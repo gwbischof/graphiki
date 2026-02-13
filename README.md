@@ -1,6 +1,6 @@
 # Graphiki
 
-Graphiki is a wiki for graphs. It lets teams build, explore, and curate knowledge graphs through a browser — the same way a traditional wiki lets you collaboratively edit text.
+Graphiki is a graph-based wiki web app. It lets teams build, explore, and curate knowledge graphs through a browser — the same way a traditional wiki lets you collaboratively edit text.
 
 The graph lives in Memgraph and renders in real-time with Sigma.js (WebGL). Nodes and edges are color-coded by type, laid out with ForceAtlas2, and organized into communities you can zoom into hierarchically. Click any node to see its properties, connections, source documents, and financial amounts.
 
