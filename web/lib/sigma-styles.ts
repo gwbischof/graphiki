@@ -4,21 +4,22 @@
 import type { Attributes } from "graphology-types";
 import type { GraphConfig } from "./graph-config";
 
-// Map doc_count to node size (log scale)
+// Map doc_count to node size (log scale, pixel-based)
 function docCountToSize(count: number, multiplier = 1): number {
-  if (count <= 0) return 4;
-  const s = Math.log10(count + 1) * 4;
-  return Math.max(4, Math.min(20, s * multiplier));
+  if (count <= 0) return 3;
+  const s = Math.log10(count + 1) * 2;
+  return Math.max(3, Math.min(10, s * multiplier));
 }
 
 // Map config shapes to Sigma node types
+// Sigma v3 only ships circle and point programs — map everything to circle
 const SHAPE_MAP: Record<string, string> = {
   ellipse: "circle",
-  diamond: "diamond",
-  hexagon: "hexagon",
-  rectangle: "square",
-  triangle: "triangle",
-  star: "star",
+  diamond: "circle",
+  hexagon: "circle",
+  rectangle: "circle",
+  triangle: "circle",
+  star: "circle",
 };
 
 export function getNodeColor(
@@ -89,6 +90,8 @@ export function createNodeReducer(config: GraphConfig, nodeState: NodeState) {
       size,
       color,
       type: shape,
+      borderColor: adjustAlpha(color, 0.35),
+      borderSize: 1.5,
     };
 
     // Positions from server
@@ -103,7 +106,7 @@ export function createNodeReducer(config: GraphConfig, nodeState: NodeState) {
 
     // Search match highlighting
     if (nodeState.searchMatches.has(node)) {
-      result.borderColor = "#ff9e64";
+      result.borderColor = "#ffb847";
       result.borderSize = 3;
       result.forceLabel = true;
       result.zIndex = 998;
@@ -120,10 +123,14 @@ export function createNodeReducer(config: GraphConfig, nodeState: NodeState) {
     // Connected to selected
     else if (nodeState.dimmed && nodeState.connected.has(node)) {
       result.forceLabel = true;
+      result.borderColor = adjustAlpha(color, 0.6);
+      result.borderSize = 2;
     }
     // Dimmed (not connected, not selected)
     else if (nodeState.dimmed && !nodeState.connected.has(node)) {
-      result.color = adjustAlpha(color, 0.15);
+      result.color = adjustAlpha(color, 0.2);
+      result.borderColor = adjustAlpha(color, 0.08);
+      result.borderSize = 0;
       result.label = "";
     }
 
@@ -139,7 +146,7 @@ export function createEdgeReducer(config: GraphConfig, edgeState: EdgeState) {
 
     const result: SigmaEdgeDisplayData = {
       size: 1.5,
-      color: adjustAlpha(color, 0.4),
+      color: adjustAlpha(color, 0.65),
     };
 
     if (edgeState.filteredOut.has(_edge)) {
@@ -148,14 +155,70 @@ export function createEdgeReducer(config: GraphConfig, edgeState: EdgeState) {
     }
 
     if (edgeState.connected.has(_edge)) {
-      result.size = 2.5;
-      result.color = adjustAlpha(color, 0.9);
+      result.size = 3;
+      result.color = adjustAlpha(color, 0.95);
     } else if (edgeState.dimmed) {
-      result.color = adjustAlpha(color, 0.08);
+      result.color = adjustAlpha(color, 0.12);
     }
 
     return result;
   };
+}
+
+// Custom hover renderer — dark background instead of Sigma's default white
+export function drawDarkHover(
+  context: CanvasRenderingContext2D,
+  data: Record<string, unknown>,
+  settings: Record<string, unknown>,
+) {
+  const label = data.label as string;
+  if (!label) return;
+
+  const size = (settings.labelSize as number) || 11;
+  const font = (settings.labelFont as string) || "system-ui, sans-serif";
+  const weight = (settings.labelWeight as string) || "normal";
+  const x = data.x as number;
+  const y = data.y as number;
+  const nodeSize = data.size as number;
+
+  context.font = `${weight} ${size}px ${font}`;
+  const textWidth = context.measureText(label).width;
+
+  const PADDING = 4;
+  const boxWidth = Math.round(textWidth + 8);
+  const boxHeight = Math.round(size + 2 * PADDING);
+  const radius = Math.max(nodeSize, size / 2) + PADDING;
+
+  const angleRadian = Math.asin(boxHeight / 2 / radius);
+  const xDelta = Math.sqrt(Math.abs(radius * radius - (boxHeight / 2) * (boxHeight / 2)));
+
+  // Dark background with subtle glow
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.shadowBlur = 12;
+  context.shadowColor = "rgba(0,0,0,0.6)";
+  context.fillStyle = "rgba(10, 13, 28, 0.92)";
+
+  context.beginPath();
+  context.moveTo(x + xDelta, y + boxHeight / 2);
+  context.lineTo(x + radius + boxWidth, y + boxHeight / 2);
+  context.lineTo(x + radius + boxWidth, y - boxHeight / 2);
+  context.lineTo(x + xDelta, y - boxHeight / 2);
+  context.arc(x, y, radius, angleRadian, -angleRadian);
+  context.closePath();
+  context.fill();
+
+  // Subtle border
+  context.strokeStyle = "rgba(255,255,255,0.12)";
+  context.lineWidth = 1;
+  context.stroke();
+
+  // Reset shadow
+  context.shadowBlur = 0;
+
+  // Draw label text
+  context.fillStyle = "#e8ecf8";
+  context.fillText(label, x + nodeSize + 3, y + size / 3);
 }
 
 // Adjust hex color to include alpha as rgba

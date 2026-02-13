@@ -11,6 +11,7 @@ import { cytoscapeToGraphology } from "@/lib/graph-adapter";
 import {
   createNodeReducer,
   createEdgeReducer,
+  drawDarkHover,
   type NodeState,
   type EdgeState,
 } from "@/lib/sigma-styles";
@@ -173,13 +174,14 @@ export function GraphCanvas({
       renderLabels: true,
       labelFont: "system-ui, sans-serif",
       labelSize: 11,
-      labelColor: { color: "#c0caf5" },
+      labelColor: { color: "#dde2f5" },
       labelRenderedSizeThreshold: 6,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      defaultDrawNodeHover: drawDarkHover as any,
       defaultEdgeType: "arrow",
       minCameraRatio: 0.05,
       maxCameraRatio: 10,
-      zoomToSizeRatioFunction: (x) => x,
-      itemSizesReference: "positions",
+      itemSizesReference: "screen",
       stagePadding: 60,
     };
 
