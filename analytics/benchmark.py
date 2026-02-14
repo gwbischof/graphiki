@@ -37,7 +37,7 @@ def benchmark(driver, name: str, cypher: str, params: dict = None, iterations: i
 
 def main():
     parser = argparse.ArgumentParser(description="Graph benchmark")
-    parser.add_argument("--uri", default="bolt://localhost:7687", help="Memgraph URI")
+    parser.add_argument("--uri", default="bolt://localhost:7687", help="Neo4j URI")
     parser.add_argument("--iterations", type=int, default=10, help="Iterations per query")
     args = parser.parse_args()
 

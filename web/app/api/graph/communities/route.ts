@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { getCommunities } from "@/lib/graph-queries";
 
 export async function GET(request: NextRequest) {
@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") || "200"), 500);
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { elements: [], source: "static", message: "Memgraph not available. Communities require a live database." }
+        { elements: [], source: "static", message: "Neo4j not available. Communities require a live database." }
       );
     }
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
           nodes: elements.filter((e) => e.group === "nodes").length,
           edges: elements.filter((e) => e.group === "edges").length,
         },
-        source: "memgraph",
+        source: "neo4j",
       },
       { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
     );

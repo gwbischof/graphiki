@@ -81,20 +81,20 @@ jobs:
 
             # --- Ensure infrastructure services are running ---
 
-            # Start Memgraph if not running
-            if ! docker ps --format "table {{.Names}}" | grep -q "^graphoni-memgraph$"; then
-              echo "Starting Memgraph..."
-              docker rm graphoni-memgraph 2>/dev/null || true
+            # Start Neo4j if not running
+            if ! docker ps --format "table {{.Names}}" | grep -q "^graphoni-neo4j$"; then
+              echo "Starting Neo4j..."
+              docker rm graphoni-neo4j 2>/dev/null || true
               docker run -d \
-                --name graphoni-memgraph \
+                --name graphoni-neo4j \
                 --restart unless-stopped \
                 --network "$NETWORK" \
-                memgraph/memgraph-mage \
-                --storage-properties-on-edges=true --memory-limit=48000
-              echo "Waiting for Memgraph to be ready..."
+                -e NEO4J_AUTH=none \
+                neo4j:5-community
+              echo "Waiting for Neo4j to be ready..."
               sleep 10
             else
-              echo "Memgraph already running"
+              echo "Neo4j already running"
             fi
 
             # Start Postgres if not running
@@ -141,7 +141,7 @@ jobs:
               --restart unless-stopped \
               --network "$NETWORK" \
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-              -e MEMGRAPH_URI="bolt://graphoni-memgraph:7687" \
+              -e NEO4J_URI="bolt://graphoni-neo4j:7687" \
               -e NEXTAUTH_URL="https://$DOMAIN" \
               -e NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
               -e GITHUB_ID="${{ secrets.OAUTH_GITHUB_ID }}" \

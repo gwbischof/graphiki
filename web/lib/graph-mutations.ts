@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { proposals, auditLog } from "@/lib/db/schema";
-import { writeQuery, runQuery } from "@/lib/memgraph";
+import { writeQuery, runQuery } from "@/lib/neo4j";
 
 type ProposalRow = typeof proposals.$inferSelect;
 
-/** Fetch current node state from Memgraph */
+/** Fetch current node state from Neo4j */
 export async function getNodeState(
   nodeId: string
 ): Promise<Record<string, unknown> | null> {
@@ -18,12 +18,12 @@ export async function getNodeState(
   return rec.get("props") as Record<string, unknown>;
 }
 
-/** Fetch current edge state from Memgraph */
+/** Fetch current edge state from Neo4j */
 export async function getEdgeState(
   edgeId: string
 ): Promise<Record<string, unknown> | null> {
   const records = await runQuery(
-    `MATCH ()-[r]->() WHERE r.id = $id RETURN properties(r) AS props, startNode(r).id AS src, endNode(r).id AS tgt`,
+    `MATCH (a)-[r]->(b) WHERE r.id = $id RETURN properties(r) AS props, a.id AS src, b.id AS tgt`,
     { id: edgeId }
   );
   if (records.length === 0) return null;

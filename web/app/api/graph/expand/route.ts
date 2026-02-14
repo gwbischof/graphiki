@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { getNodeWithNeighborhood } from "@/lib/graph-queries";
 
 export async function GET(request: NextRequest) {
@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { error: "Memgraph not available. Expand requires a live database." },
+        { error: "Neo4j not available. Expand requires a live database." },
         { status: 503 }
       );
     }

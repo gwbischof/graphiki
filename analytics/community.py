@@ -1,8 +1,8 @@
 """
-Community detection pipeline for Memgraph.
+Community detection pipeline for Neo4j.
 
 Runs Louvain community detection, creates Community nodes with hierarchy,
-and stores results back in Memgraph.
+and stores results back in Neo4j.
 
 Usage:
     python community.py [--uri bolt://localhost:7687] [--levels 2] [--resolution 1.0]
@@ -27,26 +27,6 @@ def clear_communities(driver):
         session.run("MATCH (c:Community) DETACH DELETE c")
         session.run("MATCH (n) REMOVE n.community_id, n.community_level_0, n.community_level_1")
     print("Cleared existing community data.")
-
-
-def run_louvain_mage(driver):
-    """Run MAGE Louvain community detection inside Memgraph."""
-    with driver.session() as session:
-        # Try MAGE Louvain first
-        try:
-            result = session.run("""
-                CALL community_detection.louvain()
-                YIELD node, community_id
-                SET node.community_level_0 = community_id
-                RETURN count(node) as assigned
-            """)
-            record = result.single()
-            count = record["assigned"]
-            print(f"MAGE Louvain assigned {count} nodes to communities.")
-            return True
-        except Exception as e:
-            print(f"MAGE Louvain not available: {e}")
-            return False
 
 
 def run_louvain_igraph(driver):
@@ -235,7 +215,7 @@ def run_layout(driver, level: int = 0):
 
 def main():
     parser = argparse.ArgumentParser(description="Community detection pipeline")
-    parser.add_argument("--uri", default="bolt://localhost:7687", help="Memgraph URI")
+    parser.add_argument("--uri", default="bolt://localhost:7687", help="Neo4j URI")
     parser.add_argument("--levels", type=int, default=1, help="Number of hierarchy levels")
     parser.add_argument("--clear", action="store_true", help="Clear existing communities first")
     args = parser.parse_args()
@@ -247,7 +227,7 @@ def main():
         with driver.session() as session:
             result = session.run("MATCH (n) RETURN count(n) as count")
             count = result.single()["count"]
-            print(f"Connected to Memgraph. {count} nodes in database.")
+            print(f"Connected to Neo4j. {count} nodes in database.")
 
         if count == 0:
             print("No nodes in database. Skipping community detection.")
@@ -259,8 +239,7 @@ def main():
         start = time.time()
 
         # Run community detection
-        if not run_louvain_mage(driver):
-            run_louvain_igraph(driver)
+        run_louvain_igraph(driver)
 
         # Create community nodes
         for level in range(args.levels):

@@ -1,7 +1,7 @@
 // All Cypher queries in one place
-// Used by API routes to query Memgraph
+// Used by API routes to query Neo4j
 
-import { runQuery, writeQuery, isMemgraphAvailable } from "./memgraph";
+import { runQuery, writeQuery, isNeo4jAvailable } from "./neo4j";
 import type { CytoscapeElement, NodeData, EdgeData, SavedView, ViewQuery } from "./graph-data";
 import { Record as Neo4jRecord } from "neo4j-driver";
 
@@ -50,7 +50,7 @@ export async function getGraphStats(): Promise<{
   nodeTypes: Record<string, number>;
   edgeTypes: Record<string, number>;
 }> {
-  if (!isMemgraphAvailable()) {
+  if (!isNeo4jAvailable()) {
     return { nodeCount: 0, edgeCount: 0, nodeTypes: {}, edgeTypes: {} };
   }
 
@@ -93,7 +93,7 @@ export async function searchNodes(
   limit = 20,
   nodeTypes?: string[]
 ): Promise<CytoscapeElement[]> {
-  if (!isMemgraphAvailable()) return [];
+  if (!isNeo4jAvailable()) return [];
 
   let cypher: string;
   const params: Record<string, unknown> = { q: `(?i).*${q}.*`, limit };
@@ -133,7 +133,7 @@ export async function getNodeWithNeighborhood(
   hops = 1,
   limit = 100
 ): Promise<CytoscapeElement[]> {
-  if (!isMemgraphAvailable()) return [];
+  if (!isNeo4jAvailable()) return [];
 
   const cypher = `
     MATCH (center {id: $nodeId})
@@ -198,7 +198,7 @@ export async function executeViewQuery(
   query: ViewQuery,
   limit = 5000
 ): Promise<CytoscapeElement[]> {
-  if (!isMemgraphAvailable()) return [];
+  if (!isNeo4jAvailable()) return [];
 
   let cypher: string;
   const params: Record<string, unknown> = { limit };
@@ -319,7 +319,7 @@ export async function getCommunities(
   level = 0,
   limit = 200
 ): Promise<CytoscapeElement[]> {
-  if (!isMemgraphAvailable()) return [];
+  if (!isNeo4jAvailable()) return [];
 
   const nodeRecords = await runQuery(
     `MATCH (c:Community {level: $level})
@@ -398,7 +398,7 @@ export async function getCommunityMembers(
   communityId: string,
   limit = 5000
 ): Promise<CytoscapeElement[]> {
-  if (!isMemgraphAvailable()) return [];
+  if (!isNeo4jAvailable()) return [];
 
   // Get member nodes
   const nodeRecords = await runQuery(
@@ -447,7 +447,7 @@ export async function getCommunityMembers(
 // ── Views CRUD ──
 
 export async function listViews(): Promise<SavedView[]> {
-  if (!isMemgraphAvailable()) return [];
+  if (!isNeo4jAvailable()) return [];
 
   const records = await runQuery(
     "MATCH (v:View) RETURN v ORDER BY v.created_at DESC"
@@ -467,7 +467,7 @@ export async function listViews(): Promise<SavedView[]> {
 }
 
 export async function getView(slug: string): Promise<SavedView | null> {
-  if (!isMemgraphAvailable()) return null;
+  if (!isNeo4jAvailable()) return null;
 
   const records = await runQuery(
     "MATCH (v:View {slug: $slug}) RETURN v",

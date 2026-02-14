@@ -10,7 +10,7 @@ Usage:
     python graph.py stats                        # Show node/edge counts
     python graph.py export-json                  # Export graph as Cytoscape JSON
 
-Requires: Memgraph running on MEMGRAPH_URI (default bolt://localhost:7687)
+Requires: Neo4j running on NEO4J_URI (default bolt://localhost:7687)
 """
 
 import json
@@ -21,9 +21,9 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from neo4j import GraphDatabase
 
-MEMGRAPH_URI = os.environ.get("MEMGRAPH_URI", "bolt://localhost:7687")
-MEMGRAPH_USER = os.environ.get("MEMGRAPH_USER", "")
-MEMGRAPH_PASS = os.environ.get("MEMGRAPH_PASS", "")
+NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
+NEO4J_USER = os.environ.get("NEO4J_USER", "")
+NEO4J_PASS = os.environ.get("NEO4J_PASS", "")
 
 ROOT = Path(__file__).parent
 TEMPLATE_DIR = ROOT / "templates"
@@ -31,8 +31,8 @@ OUTPUT_DIR = ROOT / "output"
 
 
 def get_driver():
-    auth = (MEMGRAPH_USER, MEMGRAPH_PASS) if MEMGRAPH_USER else None
-    return GraphDatabase.driver(MEMGRAPH_URI, auth=auth)
+    auth = (NEO4J_USER, NEO4J_PASS) if NEO4J_USER else None
+    return GraphDatabase.driver(NEO4J_URI, auth=auth)
 
 
 # ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ def create_schema(session):
     """Create indexes for fast lookups."""
     for label in ("Person", "Organization", "Location"):
         try:
-            session.run(f"CREATE INDEX ON :{label}(id);")
+            session.run(f"CREATE INDEX IF NOT EXISTS FOR (n:{label}) ON (n.id)")
         except Exception:
             pass  # index may already exist
 
@@ -261,7 +261,7 @@ def generate_html(elements):
 
 def cmd_init():
     """Create schema, load seed data, generate visualization."""
-    print("Connecting to Memgraph...")
+    print("Connecting to Neo4j...")
     driver = get_driver()
     with driver.session() as session:
         print("Creating schema...")
@@ -277,7 +277,7 @@ def cmd_init():
 
 def cmd_viz():
     """Regenerate HTML from current DB state."""
-    print("Connecting to Memgraph...")
+    print("Connecting to Neo4j...")
     driver = get_driver()
     with driver.session() as session:
         print("Exporting visualization...")
@@ -325,7 +325,7 @@ def cmd_add_person(person_id, name, role):
 
 def cmd_export_json():
     """Export full graph as Cytoscape.js JSON to data/graph.json."""
-    print("Connecting to Memgraph...")
+    print("Connecting to Neo4j...")
     driver = get_driver()
     with driver.session() as session:
         print("Exporting graph data...")

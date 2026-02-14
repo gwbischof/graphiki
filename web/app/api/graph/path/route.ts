@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
-import { runQuery } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
+import { runQuery } from "@/lib/neo4j";
 import { Record as Neo4jRecord } from "neo4j-driver";
 import type { CytoscapeElement, NodeData, EdgeData } from "@/lib/graph-data";
 
@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { error: "Memgraph not available. Path finding requires a live database." },
+        { error: "Neo4j not available. Path finding requires a live database." },
         { status: 503 }
       );
     }

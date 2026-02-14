@@ -1,28 +1,24 @@
-// Memgraph indexes for all query patterns
-// Run after data load: cat indexes.cypher | mgconsole
+// Neo4j indexes for all query patterns
+// Run after data load: cat indexes.cypher | cypher-shell -a bolt://localhost:7687
 
 // Node property indexes for search
-CREATE INDEX ON :Person(id);
-CREATE INDEX ON :Person(label);
-CREATE INDEX ON :Person(name);
-CREATE INDEX ON :Organization(id);
-CREATE INDEX ON :Organization(label);
-CREATE INDEX ON :Location(id);
-CREATE INDEX ON :Location(label);
+CREATE INDEX IF NOT EXISTS FOR (n:Person) ON (n.id);
+CREATE INDEX IF NOT EXISTS FOR (n:Person) ON (n.label);
+CREATE INDEX IF NOT EXISTS FOR (n:Person) ON (n.name);
+CREATE INDEX IF NOT EXISTS FOR (n:Organization) ON (n.id);
+CREATE INDEX IF NOT EXISTS FOR (n:Organization) ON (n.label);
+CREATE INDEX IF NOT EXISTS FOR (n:Location) ON (n.id);
+CREATE INDEX IF NOT EXISTS FOR (n:Location) ON (n.label);
 
 // Community indexes
-CREATE INDEX ON :Community(id);
-CREATE INDEX ON :Community(level);
-CREATE INDEX ON :Community(community_id);
+CREATE INDEX IF NOT EXISTS FOR (n:Community) ON (n.id);
+CREATE INDEX IF NOT EXISTS FOR (n:Community) ON (n.level);
+CREATE INDEX IF NOT EXISTS FOR (n:Community) ON (n.community_id);
 
 // View indexes
-CREATE INDEX ON :View(slug);
+CREATE INDEX IF NOT EXISTS FOR (n:View) ON (n.slug);
 
 // General node index
-CREATE INDEX ON :Person(node_type);
-CREATE INDEX ON :Organization(node_type);
-CREATE INDEX ON :Location(node_type);
-
-// Edge property indexes (Memgraph supports these with --storage-properties-on-edges=true)
-// Note: Memgraph indexes on edge properties are not supported via CREATE INDEX
-// but the flag enables property access on edges
+CREATE INDEX IF NOT EXISTS FOR (n:Person) ON (n.node_type);
+CREATE INDEX IF NOT EXISTS FOR (n:Organization) ON (n.node_type);
+CREATE INDEX IF NOT EXISTS FOR (n:Location) ON (n.node_type);

@@ -1,5 +1,5 @@
 """
-Pre-compute ForceAtlas2-style layout positions for nodes in Memgraph.
+Pre-compute ForceAtlas2-style layout positions for nodes in Neo4j.
 
 Can compute layout for:
 - All nodes (full graph, for small graphs)
@@ -122,7 +122,7 @@ def layout_all_communities(driver):
 
 def main():
     parser = argparse.ArgumentParser(description="Graph layout computation")
-    parser.add_argument("--uri", default="bolt://localhost:7687", help="Memgraph URI")
+    parser.add_argument("--uri", default="bolt://localhost:7687", help="Neo4j URI")
     parser.add_argument("--target", default="all", help="Layout target: all, communities, or community_<id>")
     parser.add_argument("--max-nodes", type=int, default=50000, help="Max nodes for full graph layout")
     args = parser.parse_args()

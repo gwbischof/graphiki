@@ -1,7 +1,7 @@
 """
-Auto-generate graph-config.json from Memgraph schema.
+Auto-generate graph-config.json from Neo4j schema.
 
-Scans Memgraph to discover:
+Scans Neo4j to discover:
 - Node types (labels) and their property distributions
 - Edge types (relationship types)
 - Auto-assigns colors and shapes
@@ -171,8 +171,8 @@ def generate_config(schema):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate graph config from Memgraph schema")
-    parser.add_argument("--uri", default="bolt://localhost:7687", help="Memgraph URI")
+    parser = argparse.ArgumentParser(description="Generate graph config from Neo4j schema")
+    parser.add_argument("--uri", default="bolt://localhost:7687", help="Neo4j URI")
     parser.add_argument("--output", default="../web/public/data/graph-config.json", help="Output path")
     args = parser.parse_args()
 

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { getGraphStats } from "@/lib/graph-queries";
 import { readFileSync } from "fs";
 import { join } from "path";
 
 export async function GET() {
   try {
-    if (isMemgraphAvailable()) {
+    if (isNeo4jAvailable()) {
       const stats = await getGraphStats();
       return NextResponse.json(stats);
     }

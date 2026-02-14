@@ -3,14 +3,15 @@
 # The web container is deployed separately via GitHub Actions
 
 services:
-  memgraph:
-    image: memgraph/memgraph-mage
-    command: ["--storage-properties-on-edges=true", "--memory-limit=48000"]
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: none
     volumes:
-      - memgraph-data:/var/lib/memgraph
+      - neo4j-data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mgconsole", "--host", "127.0.0.1", "--port", "7687", "-c", "RETURN 1;"]
+      test: ["CMD", "cypher-shell", "-a", "bolt://localhost:7687", "RETURN 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,7 +36,7 @@ services:
       - root_default
 
 volumes:
-  memgraph-data:
+  neo4j-data:
   postgres-data:
 
 networks:

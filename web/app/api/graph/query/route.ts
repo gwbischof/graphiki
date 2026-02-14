@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { executeViewQuery } from "@/lib/graph-queries";
 import { requireRole } from "@/lib/auth-guard";
 import type { ViewQuery } from "@/lib/graph-data";
@@ -9,9 +9,9 @@ export async function POST(request: NextRequest) {
   if (authError) return authError;
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { error: "Memgraph not available. Query endpoint requires a live database." },
+        { error: "Neo4j not available. Query endpoint requires a live database." },
         { status: 503 }
       );
     }

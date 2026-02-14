@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { getNodeWithNeighborhood } from "@/lib/graph-queries";
 import { readFileSync } from "fs";
 import { join } from "path";
@@ -15,12 +15,12 @@ export async function GET(
   const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 500);
 
   try {
-    if (isMemgraphAvailable()) {
+    if (isNeo4jAvailable()) {
       const elements = await getNodeWithNeighborhood(id, hops, limit);
       if (elements.length === 0) {
         return NextResponse.json({ error: "Node not found" }, { status: 404 });
       }
-      return NextResponse.json({ elements, source: "memgraph" });
+      return NextResponse.json({ elements, source: "neo4j" });
     }
 
     // Fallback: filter static JSON

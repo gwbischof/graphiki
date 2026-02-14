@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { listViews, createView } from "@/lib/graph-queries";
 import { requireRole } from "@/lib/auth-guard";
 import type { SavedView } from "@/lib/graph-data";
 
 export async function GET() {
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json({ views: [], source: "static" });
     }
 
     const views = await listViews();
-    return NextResponse.json({ views, source: "memgraph" });
+    return NextResponse.json({ views, source: "neo4j" });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to list views", detail: String(error) },
@@ -25,9 +25,9 @@ export async function POST(request: NextRequest) {
   if (authError) return authError;
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { error: "Memgraph not available. Views require a live database." },
+        { error: "Neo4j not available. Views require a live database." },
         { status: 503 }
       );
     }

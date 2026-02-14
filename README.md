@@ -7,7 +7,7 @@ Graphoni is a graph-based wiki web app. It lets teams build, explore, and curate
 
 ## How it works
 
-The graph is stored in Memgraph (a Cypher-compatible graph database) and rendered in real-time with Sigma.js over WebGL. Nodes and edges are color-coded by type, laid out with ForceAtlas2, and organized into communities you can zoom into. Click any node to see its properties, connections, and linked documents.
+The graph is stored in Neo4j (a Cypher graph database) and rendered in real-time with Sigma.js over WebGL. Nodes and edges are color-coded by type, laid out with ForceAtlas2, and organized into communities you can zoom into. Click any node to see its properties, connections, and linked documents.
 
 **Views** are saved queries on the graph. A view might show only money transfers, or messages between people, or ownership chains — any subgraph you can express as a Cypher query. Views can be saved by slug and shared as links.
 
@@ -36,7 +36,7 @@ Early stage. The core components are connected and working: graph rendering, aut
 1. **User** submits a proposal (edit-node, add-node, delete-node, add/edit/delete-edge)
 2. Proposal stored in PostgreSQL with `status: pending`, current graph state captured as `dataBefore`
 3. **Mod** reviews and approves/rejects
-4. On approval: Cypher auto-executed against Memgraph, `status: applied`, audit log written
+4. On approval: Cypher auto-executed against Neo4j, `status: applied`, audit log written
 5. **Admin** can bypass review with "Apply Directly" option (still audit-logged)
 
 ### API
@@ -62,11 +62,11 @@ Early stage. The core components are connected and working: graph rendering, aut
 ### 1. Start databases
 
 ```bash
-docker compose up -d memgraph postgres
+docker compose up -d neo4j postgres
 ```
 
 This starts:
-- **Memgraph** — Bolt on `localhost:7687`, Lab UI on `localhost:3000`
+- **Neo4j** — Bolt on `localhost:7687`, Browser UI on `localhost:7474`
 - **PostgreSQL** — `localhost:5432` (user: `graphoni`, password: `graphoni_dev`, db: `graphoni`)
 
 ### 2. Install dependencies
@@ -95,7 +95,7 @@ This creates two dev users:
 The default `.env.local` works out of the box for local development:
 
 ```env
-MEMGRAPH_URI=bolt://localhost:7687
+NEO4J_URI=bolt://localhost:7687
 DATABASE_URL=postgresql://graphoni:graphoni_dev@localhost:5432/graphoni
 NEXTAUTH_URL=http://localhost:3001
 NEXTAUTH_SECRET=dev-secret-please-change-in-production-abc123
@@ -113,12 +113,12 @@ GITHUB_SECRET=your_github_oauth_app_secret
 # Install Python deps
 pip install -r requirements.txt
 
-# Load seed data into Memgraph + export JSON
+# Load seed data into Neo4j + export JSON
 python graph.py init
 python graph.py export-json
 ```
 
-Or skip this step — the frontend falls back to `public/data/graph.json` if Memgraph has no data.
+Or skip this step — the frontend falls back to `public/data/graph.json` if Neo4j has no data.
 
 ### 6. Start the dev server
 
@@ -167,7 +167,7 @@ docker compose up -d
 ```
 
 This starts all three services:
-- **memgraph** on port 7687 (Bolt) and 3000 (Lab UI)
+- **neo4j** on port 7687 (Bolt) and 7474 (Browser UI)
 - **postgres** on port 5432
 - **web** on port 3001
 
@@ -184,7 +184,7 @@ docker compose exec web npx tsx lib/db/seed.ts
 
 ```bash
 # From host, with Python deps installed
-MEMGRAPH_URI=bolt://localhost:7687 python graph.py init
+NEO4J_URI=bolt://localhost:7687 python graph.py init
 ```
 
 The app is now live at [http://localhost:3001](http://localhost:3001).
@@ -196,7 +196,7 @@ The app is now live at [http://localhost:3001](http://localhost:3001).
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `MEMGRAPH_URI` | Yes | Bolt URI for Memgraph |
+| `NEO4J_URI` | Yes | Bolt URI for Neo4j |
 | `NEXTAUTH_URL` | Yes | Public URL of the app (e.g. `https://graphoni.example.com`) |
 | `NEXTAUTH_SECRET` | Yes | Random secret for session encryption |
 | `GITHUB_ID` | Yes | GitHub OAuth App client ID |
@@ -382,7 +382,7 @@ client.approve_proposal("uuid-here", comment="Verified")
 - **NextAuth.js v5** — Authentication (GitHub OAuth + dev credentials)
 - **Drizzle ORM** — Type-safe PostgreSQL queries
 - **PostgreSQL 16** — Users, proposals, audit trail
-- **Memgraph** — Graph database (Neo4j-compatible, Bolt protocol)
+- **Neo4j Community Edition** — Graph database (Cypher, Bolt protocol)
 - **Framer Motion** — Panel animations, starfield parallax
 - **shadcn/ui** — UI components (Radix primitives)
 - **Tailwind CSS 4** — Styling

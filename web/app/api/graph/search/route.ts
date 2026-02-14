@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { searchNodes } from "@/lib/graph-queries";
 import { readFileSync } from "fs";
 import { join } from "path";
@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    if (isMemgraphAvailable()) {
+    if (isNeo4jAvailable()) {
       const results = await searchNodes(q, limit, types);
-      return NextResponse.json({ results, source: "memgraph" });
+      return NextResponse.json({ results, source: "neo4j" });
     }
 
     // Fallback: search static JSON

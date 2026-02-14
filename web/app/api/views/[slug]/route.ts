@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMemgraphAvailable } from "@/lib/memgraph";
+import { isNeo4jAvailable } from "@/lib/neo4j";
 import { getView, deleteView, executeViewQuery } from "@/lib/graph-queries";
 import { requireRole } from "@/lib/auth-guard";
 
@@ -10,9 +10,9 @@ export async function GET(
   const { slug } = await params;
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { error: "Memgraph not available" },
+        { error: "Neo4j not available" },
         { status: 503 }
       );
     }
@@ -58,9 +58,9 @@ export async function DELETE(
   const { slug } = await params;
 
   try {
-    if (!isMemgraphAvailable()) {
+    if (!isNeo4jAvailable()) {
       return NextResponse.json(
-        { error: "Memgraph not available" },
+        { error: "Neo4j not available" },
         { status: 503 }
       );
     }

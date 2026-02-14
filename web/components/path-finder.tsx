@@ -41,7 +41,7 @@ export function PathFinder({ onPathFound }: PathFinderProps) {
         onPathFound(data.elements);
       }
     } catch {
-      setError("Path finding failed. Is Memgraph running?");
+      setError("Path finding failed. Is Neo4j running?");
     }
 
     setLoading(false);

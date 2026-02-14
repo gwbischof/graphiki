@@ -1,4 +1,4 @@
-// Singleton neo4j-driver wrapper for Memgraph
+// Singleton neo4j-driver wrapper for Neo4j
 // Server-only — never import from client components
 
 import neo4j, { Driver, Session, Record as Neo4jRecord } from "neo4j-driver";
@@ -6,7 +6,7 @@ import neo4j, { Driver, Session, Record as Neo4jRecord } from "neo4j-driver";
 let driver: Driver | null = null;
 
 export function getDriver(): Driver | null {
-  const uri = process.env.MEMGRAPH_URI;
+  const uri = process.env.NEO4J_URI;
   if (!uri) return null;
 
   if (!driver) {
@@ -19,8 +19,8 @@ export function getDriver(): Driver | null {
   return driver;
 }
 
-export function isMemgraphAvailable(): boolean {
-  return !!process.env.MEMGRAPH_URI;
+export function isNeo4jAvailable(): boolean {
+  return !!process.env.NEO4J_URI;
 }
 
 const MAX_RETRIES = 2;
@@ -36,9 +36,9 @@ export async function runQuery<T = Neo4jRecord>(
   timeout = 30000
 ): Promise<T[]> {
   const d = getDriver();
-  if (!d) throw new Error("Memgraph not configured (MEMGRAPH_URI not set)");
+  if (!d) throw new Error("Neo4j not configured (NEO4J_URI not set)");
 
-  // Memgraph requires integer params (LIMIT, SKIP, level) as neo4j Integer type
+  // Neo4j requires integer params (LIMIT, SKIP, level) as neo4j Integer type
   const safeParams: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(params)) {
     safeParams[k] = typeof v === "number" && Number.isInteger(v) ? neo4j.int(v) : v;
@@ -78,7 +78,7 @@ export async function writeQuery<T = Neo4jRecord>(
   timeout = 30000
 ): Promise<T[]> {
   const d = getDriver();
-  if (!d) throw new Error("Memgraph not configured (MEMGRAPH_URI not set)");
+  if (!d) throw new Error("Neo4j not configured (NEO4J_URI not set)");
 
   const safeParams: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(params)) {
