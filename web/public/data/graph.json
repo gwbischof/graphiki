@@ -1348,15 +1348,6 @@
       "group": "edges",
       "data": {
         "id": "e23",
-        "source": "jeffrey_epstein",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e24",
         "source": "ghislaine_maxwell",
         "target": "virginia_giuffre",
         "edge_type": "RELATIONSHIP",
@@ -1369,7 +1360,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e25",
+        "id": "e24",
         "source": "ghislaine_maxwell",
         "target": "tony_figueroa",
         "edge_type": "RELATIONSHIP",
@@ -1382,7 +1373,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e26",
+        "id": "e25",
         "source": "ghislaine_maxwell",
         "target": "lesley_groff",
         "edge_type": "DOCUMENT",
@@ -1394,16 +1385,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e27",
-        "source": "ghislaine_maxwell",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e28",
+        "id": "e26",
         "source": "jean_luc_brunel",
         "target": "daniel_siad",
         "edge_type": "RELATIONSHIP",
@@ -1416,7 +1398,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e29",
+        "id": "e27",
         "source": "jean_luc_brunel",
         "target": "leslie_wexner",
         "edge_type": "DOCUMENT",
@@ -1428,7 +1410,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e30",
+        "id": "e28",
         "source": "jean_luc_brunel",
         "target": "mc2_models",
         "edge_type": "AFFILIATION",
@@ -1440,16 +1422,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e31",
-        "source": "jean_luc_brunel",
-        "target": "community_0_2",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e32",
+        "id": "e29",
         "source": "daniel_siad",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1463,7 +1436,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e33",
+        "id": "e30",
         "source": "daniel_siad",
         "target": "jean_luc_brunel",
         "edge_type": "DOCUMENT",
@@ -1475,61 +1448,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e34",
-        "source": "daniel_siad",
-        "target": "community_0_2",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e35",
-        "source": "sarah_kellen",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e36",
-        "source": "nadia_marcinkova",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e37",
-        "source": "adriana_ross",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e38",
-        "source": "lesley_groff",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e39",
-        "source": "tony_figueroa",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e40",
+        "id": "e31",
         "source": "leslie_wexner",
         "target": "jeffrey_epstein",
         "edge_type": "MONEY",
@@ -1543,7 +1462,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e41",
+        "id": "e32",
         "source": "leslie_wexner",
         "target": "jeffrey_epstein",
         "edge_type": "DOCUMENT",
@@ -1555,7 +1474,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e42",
+        "id": "e33",
         "source": "leslie_wexner",
         "target": "l_brands",
         "edge_type": "AFFILIATION",
@@ -1567,7 +1486,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e43",
+        "id": "e34",
         "source": "leslie_wexner",
         "target": "nine_east_71st",
         "edge_type": "OWNERSHIP",
@@ -1579,7 +1498,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e44",
+        "id": "e35",
         "source": "leslie_wexner",
         "target": "l_brands",
         "edge_type": "OWNERSHIP",
@@ -1591,25 +1510,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e45",
-        "source": "leslie_wexner",
-        "target": "community_0_2",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e46",
-        "source": "prince_andrew",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e47",
+        "id": "e36",
         "source": "peter_mandelson",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1621,16 +1522,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e48",
-        "source": "peter_mandelson",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e49",
+        "id": "e37",
         "source": "valdson_cotrin",
         "target": "avenue_foch",
         "edge_type": "AFFILIATION",
@@ -1642,16 +1534,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e50",
-        "source": "valdson_cotrin",
-        "target": "community_0_3",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e51",
+        "id": "e38",
         "source": "deepak_chopra",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1663,16 +1546,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e52",
-        "source": "deepak_chopra",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e53",
+        "id": "e39",
         "source": "elon_musk",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1686,16 +1560,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e54",
-        "source": "elon_musk",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e55",
+        "id": "e40",
         "source": "howard_lutnick",
         "target": "jeffrey_epstein",
         "edge_type": "RELATIONSHIP",
@@ -1708,16 +1573,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e56",
-        "source": "howard_lutnick",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e57",
+        "id": "e41",
         "source": "david_stern",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1731,7 +1587,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e58",
+        "id": "e42",
         "source": "david_stern",
         "target": "prince_andrew",
         "edge_type": "RELATIONSHIP",
@@ -1744,25 +1600,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e59",
-        "source": "david_stern",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e60",
-        "source": "leon_botstein",
-        "target": "community_0_4",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e61",
+        "id": "e43",
         "source": "sultan_bin_sulayem",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1776,16 +1614,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e62",
-        "source": "sultan_bin_sulayem",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e63",
+        "id": "e44",
         "source": "miroslav_lajcak",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1797,16 +1626,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e64",
-        "source": "miroslav_lajcak",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e65",
+        "id": "e45",
         "source": "roger_schank",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1820,16 +1640,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e66",
-        "source": "roger_schank",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e67",
+        "id": "e46",
         "source": "peter_thiel",
         "target": "valar_ventures",
         "edge_type": "AFFILIATION",
@@ -1841,16 +1652,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e68",
-        "source": "peter_thiel",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e69",
+        "id": "e47",
         "source": "leon_black",
         "target": "jeffrey_epstein",
         "edge_type": "MONEY",
@@ -1864,7 +1666,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e70",
+        "id": "e48",
         "source": "leon_black",
         "target": "apollo_global",
         "edge_type": "AFFILIATION",
@@ -1876,16 +1678,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e71",
-        "source": "leon_black",
-        "target": "community_0_5",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e72",
+        "id": "e49",
         "source": "terje_rod_larsen",
         "target": "jeffrey_epstein",
         "edge_type": "COMMUNICATION",
@@ -1897,16 +1690,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e73",
-        "source": "terje_rod_larsen",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e74",
+        "id": "e50",
         "source": "mort_zuckerman",
         "target": "jeffrey_epstein",
         "edge_type": "MONEY",
@@ -1920,16 +1704,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e75",
-        "source": "mort_zuckerman",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e76",
+        "id": "e51",
         "source": "jimmy_cayne",
         "target": "bear_stearns",
         "edge_type": "AFFILIATION",
@@ -1941,16 +1716,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e77",
-        "source": "jimmy_cayne",
-        "target": "community_0_6",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e78",
+        "id": "e52",
         "source": "darren_indyke",
         "target": "richard_kahn",
         "edge_type": "DOCUMENT",
@@ -1962,7 +1728,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e79",
+        "id": "e53",
         "source": "darren_indyke",
         "target": "nine_east_71st",
         "edge_type": "AFFILIATION",
@@ -1976,16 +1742,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e80",
-        "source": "darren_indyke",
-        "target": "community_0_7",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e81",
+        "id": "e54",
         "source": "richard_kahn",
         "target": "southern_trust_company",
         "edge_type": "AFFILIATION",
@@ -1997,16 +1754,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e82",
-        "source": "richard_kahn",
-        "target": "community_0_7",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e83",
+        "id": "e55",
         "source": "david_rogers",
         "target": "little_st_james",
         "edge_type": "AFFILIATION",
@@ -2018,16 +1766,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e84",
-        "source": "david_rogers",
-        "target": "community_0_8",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e85",
+        "id": "e56",
         "source": "larry_visoski",
         "target": "little_st_james",
         "edge_type": "AFFILIATION",
@@ -2039,16 +1778,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e86",
-        "source": "larry_visoski",
-        "target": "community_0_8",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e87",
+        "id": "e57",
         "source": "juan_alessi",
         "target": "el_brillo_way",
         "edge_type": "AFFILIATION",
@@ -2060,25 +1790,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e88",
-        "source": "juan_alessi",
-        "target": "community_0_9",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e89",
-        "source": "karyna_shuliak",
-        "target": "community_0_10",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e90",
+        "id": "e58",
         "source": "sky_roberts",
         "target": "virginia_giuffre",
         "edge_type": "RELATIONSHIP",
@@ -2089,7 +1801,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e91",
+        "id": "e59",
         "source": "sky_roberts",
         "target": "mar_a_lago",
         "edge_type": "AFFILIATION",
@@ -2101,16 +1813,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e92",
-        "source": "sky_roberts",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e93",
+        "id": "e60",
         "source": "ron_eppinger",
         "target": "virginia_giuffre",
         "edge_type": "RELATIONSHIP",
@@ -2121,16 +1824,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e94",
-        "source": "ron_eppinger",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e95",
+        "id": "e61",
         "source": "virginia_giuffre",
         "target": "mar_a_lago",
         "edge_type": "AFFILIATION",
@@ -2142,25 +1836,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e96",
-        "source": "virginia_giuffre",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e97",
-        "source": "peter_nygard",
-        "target": "community_0_11",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e98",
+        "id": "e62",
         "source": "faith_kates",
         "target": "next_models",
         "edge_type": "AFFILIATION",
@@ -2172,16 +1848,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e99",
-        "source": "faith_kates",
-        "target": "community_0_12",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e100",
+        "id": "e63",
         "source": "paolo_zampolli",
         "target": "id_models",
         "edge_type": "AFFILIATION",
@@ -2193,115 +1860,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e101",
-        "source": "paolo_zampolli",
-        "target": "community_0_13",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e102",
-        "source": "fabrice_aidan",
-        "target": "community_0_14",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e103",
-        "source": "boris_nikolic",
-        "target": "community_0_15",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e104",
-        "source": "peggy_siegal",
-        "target": "community_0_16",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e105",
-        "source": "david_geffen",
-        "target": "community_0_17",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e106",
-        "source": "reid_hoffman",
-        "target": "community_0_18",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e107",
-        "source": "jack_lang",
-        "target": "community_0_19",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e108",
-        "source": "princess_mette_marit",
-        "target": "community_0_20",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e109",
-        "source": "thorbjorn_jagland",
-        "target": "community_0_21",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e110",
-        "source": "heather_mann",
-        "target": "community_0_22",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e111",
-        "source": "lucy_clive",
-        "target": "community_0_23",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e112",
-        "source": "etienne_binant",
-        "target": "community_0_24",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e113",
+        "id": "e64",
         "source": "jes_staley",
         "target": "bear_stearns",
         "edge_type": "AFFILIATION",
@@ -2313,25 +1872,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e114",
-        "source": "jes_staley",
-        "target": "community_0_6",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e115",
-        "source": "glenn_dubin",
-        "target": "community_0_25",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e116",
+        "id": "e65",
         "source": "bill_clinton",
         "target": "jeffrey_epstein",
         "edge_type": "RELATIONSHIP",
@@ -2342,7 +1883,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e117",
+        "id": "e66",
         "source": "bill_clinton",
         "target": "clinton_foundation",
         "edge_type": "AFFILIATION",
@@ -2354,16 +1895,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e118",
-        "source": "bill_clinton",
-        "target": "community_0_26",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e119",
+        "id": "e67",
         "source": "alan_dershowitz",
         "target": "jeffrey_epstein",
         "edge_type": "RELATIONSHIP",
@@ -2374,16 +1906,7 @@
     {
       "group": "edges",
       "data": {
-        "id": "e120",
-        "source": "alan_dershowitz",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e121",
+        "id": "e68",
         "source": "larry_summers",
         "target": "jeffrey_epstein",
         "edge_type": "RELATIONSHIP",
@@ -2394,349 +1917,13 @@
     {
       "group": "edges",
       "data": {
-        "id": "e122",
-        "source": "larry_summers",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e123",
-        "source": "andrew_farkas",
-        "target": "community_0_27",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e124",
-        "source": "george_delson",
-        "target": "community_0_28",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e125",
-        "source": "southern_trust_company",
-        "target": "community_0_7",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e126",
-        "source": "hbrk_associates",
-        "target": "community_0_29",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e127",
-        "source": "gratitude_america",
-        "target": "community_0_30",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e128",
-        "source": "mc2_models",
-        "target": "community_0_2",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e129",
-        "source": "next_models",
-        "target": "community_0_12",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e130",
-        "source": "karin_models",
-        "target": "community_0_31",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e131",
-        "source": "id_models",
-        "target": "community_0_13",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e132",
-        "source": "bear_stearns",
-        "target": "community_0_6",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e133",
-        "source": "apollo_global",
-        "target": "community_0_5",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e134",
+        "id": "e69",
         "source": "l_brands",
         "target": "victorias_secret",
         "edge_type": "OWNERSHIP",
         "date": "1982-2021",
         "description": "L Brands subsidiary",
         "stake": "100%"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e135",
-        "source": "l_brands",
-        "target": "community_0_2",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e136",
-        "source": "victorias_secret",
-        "target": "community_0_2",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e137",
-        "source": "valar_ventures",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e138",
-        "source": "edge_foundation",
-        "target": "community_0_32",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e139",
-        "source": "wexner_foundation",
-        "target": "community_0_33",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e140",
-        "source": "clinton_foundation",
-        "target": "community_0_26",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e141",
-        "source": "mar_a_lago",
-        "target": "community_0_1",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e142",
-        "source": "nine_east_71st",
-        "target": "community_0_7",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e143",
-        "source": "little_st_james",
-        "target": "community_0_8",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e144",
-        "source": "great_st_james",
-        "target": "community_0_0",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e145",
-        "source": "avenue_foch",
-        "target": "community_0_3",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e146",
-        "source": "el_brillo_way",
-        "target": "community_0_9",
-        "edge_type": "BELONGS_TO"
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e147",
-        "source": "community_0_5",
-        "target": "community_0_0",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e148",
-        "source": "community_0_2",
-        "target": "community_0_7",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e149",
-        "source": "community_0_2",
-        "target": "community_0_0",
-        "edge_type": "_inter_community",
-        "edge_count": 3
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e150",
-        "source": "community_0_0",
-        "target": "community_0_12",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e151",
-        "source": "community_0_0",
-        "target": "community_0_9",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e152",
-        "source": "community_0_0",
-        "target": "community_0_8",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e153",
-        "source": "community_0_0",
-        "target": "community_0_7",
-        "edge_type": "_inter_community",
-        "edge_count": 2
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e154",
-        "source": "community_0_0",
-        "target": "community_0_6",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e155",
-        "source": "community_0_0",
-        "target": "community_0_3",
-        "edge_type": "_inter_community",
-        "edge_count": 1
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e156",
-        "source": "community_0_0",
-        "target": "community_0_2",
-        "edge_type": "_inter_community",
-        "edge_count": 3
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e157",
-        "source": "community_0_0",
-        "target": "community_0_1",
-        "edge_type": "_inter_community",
-        "edge_count": 4
-      }
-    },
-    {
-      "group": "edges",
-      "data": {
-        "id": "e158",
-        "source": "community_0_26",
-        "target": "community_0_0",
-        "edge_type": "_inter_community",
-        "edge_count": 1
       }
     }
   ]

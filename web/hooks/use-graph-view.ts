@@ -12,26 +12,12 @@ import { loadGraphData } from "@/lib/graph-data";
 export function useGraphView() {
   const [state, dispatch] = useReducer(viewReducer, null, createInitialViewState);
 
-  // Initial load: try communities first, fall back to static data
+  // Initial load: static graph data
+  // TODO: re-enable community-first loading once hierarchical zoom is fully wired
   useEffect(() => {
     async function load() {
       dispatch({ type: "SET_LOADING", loading: true });
 
-      try {
-        // Try loading communities from API
-        const res = await fetch("/api/graph/communities?level=0");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.elements && data.elements.length > 0) {
-            dispatch({ type: "SET_ELEMENTS", elements: data.elements });
-            return;
-          }
-        }
-      } catch {
-        // API not available
-      }
-
-      // Fallback: load static graph data
       try {
         const data = await loadGraphData();
         dispatch({ type: "SET_ELEMENTS", elements: data.elements });

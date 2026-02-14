@@ -2,7 +2,7 @@
 
 import { useSession, signIn } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, PenLine, Zap, LogIn } from "lucide-react";
+import { X, PenLine, Zap, LogIn, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,6 +14,7 @@ interface DetailPanelProps {
   node: NodeData | null;
   onClose: () => void;
   onProposeEdit: () => void;
+  onAddConnection?: () => void;
   config: GraphConfig | null;
 }
 
@@ -35,7 +36,7 @@ function getSubtypeValue(node: NodeData, config: GraphConfig): string | undefine
   return node[ntConfig.subtypeField] as string | undefined;
 }
 
-export function DetailPanel({ node, onClose, onProposeEdit, config }: DetailPanelProps) {
+export function DetailPanel({ node, onClose, onProposeEdit, onAddConnection, config }: DetailPanelProps) {
   const { data: session } = useSession();
   const color = node && config
     ? getNodeColor(config, node.node_type, getSubtypeValue(node, config))
@@ -152,6 +153,17 @@ export function DetailPanel({ node, onClose, onProposeEdit, config }: DetailPane
                   <PenLine className="size-3" />
                   Propose Edit
                 </Button>
+                {onAddConnection && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onAddConnection}
+                    className="w-full h-8 text-xs gap-1.5 bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]"
+                  >
+                    <Link2 className="size-3" />
+                    New Connection
+                  </Button>
+                )}
                 {isAdmin && (
                   <Button
                     variant="outline"

@@ -143,8 +143,10 @@ export function GraphCanvas({
     const filtered = new Set<string>();
     graph.forEachEdge((key, attrs, source, target) => {
       const edgeType = attrs.edge_type as string;
+      // Internal types (prefixed with _) are always visible
+      const isInternal = edgeType.startsWith("_");
       if (
-        !activeEdgeTypes.has(edgeType) ||
+        (!isInternal && !activeEdgeTypes.has(edgeType)) ||
         filteredOutNodes.has(source) ||
         filteredOutNodes.has(target)
       ) {

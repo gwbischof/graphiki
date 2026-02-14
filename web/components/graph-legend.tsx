@@ -62,24 +62,6 @@ export function GraphLegend({ config }: GraphLegendProps) {
 
       <div className="w-px h-4 bg-white/10" />
 
-      {/* Edge types */}
-      <div className="flex items-center gap-3">
-        <span className="text-[9px] font-mono tracking-widest text-muted-foreground uppercase mr-1">
-          Edges
-        </span>
-        {Object.entries(config.edgeTypes).map(([key, etConfig]) => (
-          <div key={key} className="flex items-center gap-1.5">
-            <span
-              className="w-3 h-px"
-              style={{ backgroundColor: etConfig.color }}
-            />
-            <span className="text-[10px] text-muted-foreground">{etConfig.label || key}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="w-px h-4 bg-white/10" />
-
       {/* Shape legend — derived from config */}
       <div className="flex items-center gap-1.5">
         <span className="text-[9px] font-mono tracking-widest text-muted-foreground uppercase mr-1">

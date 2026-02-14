@@ -211,10 +211,12 @@ def export_cytoscape_json(session):
             },
         })
 
-    # --- Edges ---
+    # --- Edges (exclude community metadata edges) ---
     result = session.run(
         """
         MATCH (a)-[r]->(b)
+        WHERE NOT type(r) IN ['BELONGS_TO', 'INTER_COMMUNITY']
+          AND NOT a:Community AND NOT b:Community
         RETURN a.id AS source, b.id AS target, type(r) AS edge_type,
                properties(r) AS props
         """

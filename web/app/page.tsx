@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
@@ -19,6 +19,7 @@ import { GraphLegend } from "@/components/graph-legend";
 import { BreadcrumbBar } from "@/components/breadcrumb-bar";
 import { SaveViewDialog } from "@/components/save-view-dialog";
 import { ProposalForm } from "@/components/proposal-form";
+import { AddConnectionForm } from "@/components/add-connection-form";
 import { ModQueue } from "@/components/mod-queue";
 import { UserMenu } from "@/components/user-menu";
 import { AuditLogPanel } from "@/components/audit-log-panel";
@@ -63,6 +64,7 @@ export default function Home() {
 
   // Dialogs
   const [proposalFormOpen, setProposalFormOpen] = useState(false);
+  const [addConnectionOpen, setAddConnectionOpen] = useState(false);
   const [modQueueOpen, setModQueueOpen] = useState(false);
   const [auditLogOpen, setAuditLogOpen] = useState(false);
   const [saveViewOpen, setSaveViewOpen] = useState(false);
@@ -93,6 +95,15 @@ export default function Home() {
   // Counts
   const nodeCount = graphView.elements.filter((e) => e.group === "nodes").length;
   const edgeCount = graphView.elements.filter((e) => e.group === "edges").length;
+
+  // All nodes for the add-connection picker
+  const allNodes = useMemo(
+    () =>
+      graphView.elements
+        .filter((e) => e.group === "nodes")
+        .map((e) => e.data as NodeData),
+    [graphView.elements]
+  );
 
   // Handlers
   const handleNodeSelect = useCallback(
@@ -334,6 +345,7 @@ export default function Home() {
         node={selectedNode}
         onClose={handleCloseDetail}
         onProposeEdit={() => setProposalFormOpen(true)}
+        onAddConnection={() => setAddConnectionOpen(true)}
         config={config}
       />
 
@@ -363,6 +375,17 @@ export default function Home() {
         onOpenChange={setProposalFormOpen}
         node={selectedNode}
       />
+
+      {/* Add Connection Form */}
+      {selectedNode && config && (
+        <AddConnectionForm
+          open={addConnectionOpen}
+          onOpenChange={setAddConnectionOpen}
+          sourceNode={selectedNode}
+          allNodes={allNodes}
+          config={config}
+        />
+      )}
 
       {/* Mod Queue */}
       <ModQueue
