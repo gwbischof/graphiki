@@ -324,9 +324,11 @@ export async function executeViewQuery(
 
 export async function getAllNodes(limit = 100000): Promise<CytoscapeElement[]> {
   if (!isNeo4jAvailable()) return [];
-  // Return only the fields needed for rendering to keep payload small
+  // Skip efta document nodes on homepage (1.4M nodes too many to render).
+  // They're still reachable via search and neighborhood queries.
   const records = await runQuery(
-    `MATCH (n) RETURN n.id AS id, n.label AS label, n.name AS name,
+    `MATCH (n) WHERE NOT n:efta
+     RETURN n.id AS id, n.label AS label, n.name AS name,
      n.node_type AS node_type, n.dataset AS dataset, n.doc_count AS doc_count,
      labels(n) AS labels
      LIMIT $limit`,
