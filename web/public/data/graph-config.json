@@ -28,6 +28,13 @@
       },
       "defaultColor": "#6b7394"
     },
+    "efta": {
+      "shape": "ellipse",
+      "sizeMultiplier": 0.5,
+      "subtypeField": "dataset",
+      "subtypes": {},
+      "defaultColor": "#5b9aff"
+    },
     "Location": {
       "shape": "hexagon",
       "sizeMultiplier": 0.85,

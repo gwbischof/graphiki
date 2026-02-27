@@ -15,12 +15,18 @@ function toNumber(val: unknown): number {
   return Number(val) || 0;
 }
 
-function nodeToData(node: Record<string, unknown>): NodeData {
+const META_LABELS = new Set(["document", "available", "missing"]);
+
+function nodeToData(node: Record<string, unknown>, labels?: string[]): NodeData {
   const props = node as Record<string, unknown>;
+  let nodeType = String(props.node_type || "");
+  if (!nodeType && labels) {
+    nodeType = labels.find(l => !META_LABELS.has(l)) || "Unknown";
+  }
   return {
     id: String(props.id || ""),
     label: String(props.label || props.name || props.id || ""),
-    node_type: String(props.node_type || "Unknown"),
+    node_type: nodeType || "Unknown",
     doc_count: toNumber(props.doc_count),
     ...props,
   } as NodeData;
@@ -119,9 +125,10 @@ export async function searchNodes(
   const records = await runQuery(cypher, params);
   return records.map((rec) => {
     const r = rec as unknown as Neo4jRecord;
+    const node = r.get("n");
     return {
       group: "nodes" as const,
-      data: nodeToData(r.get("n").properties),
+      data: nodeToData(node.properties, node.labels),
     };
   });
 }
@@ -155,7 +162,7 @@ export async function getNodeWithNeighborhood(
     const r = rec as unknown as Neo4jRecord;
     const node = r.get("n");
     if (node && node.properties) {
-      const data = nodeToData(node.properties);
+      const data = nodeToData(node.properties, node.labels);
       if (!nodeIds.has(data.id)) {
         nodeIds.add(data.id);
         elements.push({ group: "nodes", data });
@@ -288,7 +295,7 @@ export async function executeViewQuery(
 
       // Node
       if (val.properties && val.labels) {
-        const data = nodeToData(val.properties);
+        const data = nodeToData(val.properties, val.labels);
         if (!seenNodes.has(data.id)) {
           seenNodes.add(data.id);
           elements.push({ group: "nodes", data });
@@ -311,6 +318,18 @@ export async function executeViewQuery(
   }
 
   return elements;
+}
+
+// ── All nodes (homepage) ──
+
+export async function getAllNodes(limit = 50000): Promise<CytoscapeElement[]> {
+  if (!isNeo4jAvailable()) return [];
+  const records = await runQuery("MATCH (n) RETURN n LIMIT $limit", { limit });
+  return records.map(rec => {
+    const r = rec as unknown as Neo4jRecord;
+    const node = r.get("n");
+    return { group: "nodes" as const, data: nodeToData(node.properties, node.labels) };
+  });
 }
 
 // ── Communities ──
@@ -413,7 +432,8 @@ export async function getCommunityMembers(
 
   for (const rec of nodeRecords) {
     const r = rec as unknown as Neo4jRecord;
-    const data = nodeToData(r.get("n").properties);
+    const node = r.get("n");
+    const data = nodeToData(node.properties, node.labels);
     nodeIds.push(data.id);
     elements.push({ group: "nodes", data });
   }
