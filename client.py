@@ -254,7 +254,7 @@ class GraphoniClient:
 
     def bulk_merge_nodes(
         self,
-        label: str,
+        labels: list[str],
         nodes: list[dict],
         merge_key: str,
         batch_size: int = 1000,
@@ -265,7 +265,7 @@ class GraphoniClient:
             batch = nodes[i : i + batch_size]
             data = self._bulk_post(
                 "/api/admin/bulk-nodes",
-                {"label": label, "nodes": batch, "merge_key": merge_key},
+                {"labels": labels, "nodes": batch, "merge_key": merge_key},
             )
             total += data.get("merged", 0)
         return total

@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeQuery } from "@/lib/neo4j";
 import { requireAdmin } from "@/lib/admin-auth";
 
+const LABEL_RE = /^[a-z_][a-z0-9_]*$/;
+
 export async function POST(request: NextRequest) {
   const { error } = await requireAdmin(request);
   if (error) return error;
 
   const body = await request.json();
-  const { label, nodes, merge_key } = body;
+  const { labels, nodes, merge_key } = body;
 
-  if (!label || !Array.isArray(nodes) || !merge_key) {
+  if (!labels || !Array.isArray(labels) || labels.length === 0 || !Array.isArray(nodes) || !merge_key) {
     return NextResponse.json(
-      { error: "label, nodes (array), and merge_key are required" },
+      { error: "labels (string array), nodes (array), and merge_key are required" },
       { status: 400 }
     );
   }
@@ -27,6 +29,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Sanitize all labels
+  for (const l of labels) {
+    if (typeof l !== "string" || !LABEL_RE.test(l)) {
+      return NextResponse.json(
+        { error: `Invalid label "${l}": must be lowercase alphanumeric/underscore` },
+        { status: 400 }
+      );
+    }
+  }
+
   // Validate merge_key exists in every node
   for (const node of nodes) {
     if (!(merge_key in node)) {
@@ -37,17 +49,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Sanitize label to prevent injection (alphanumeric + underscore only)
-  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(label)) {
-    return NextResponse.json(
-      { error: "Invalid label: must be alphanumeric/underscore" },
-      { status: 400 }
-    );
-  }
-
+  const labelStr = labels.map((l: string) => `:${l}`).join("");
   const cypher = `
     UNWIND $nodes AS n
-    MERGE (d:${label} {${merge_key}: n.${merge_key}})
+    MERGE (d${labelStr} {${merge_key}: n.${merge_key}})
     SET d += n
     RETURN count(d) AS merged
   `;
