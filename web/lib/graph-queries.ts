@@ -15,7 +15,7 @@ function toNumber(val: unknown): number {
   return Number(val) || 0;
 }
 
-const META_LABELS = new Set(["document", "available", "missing"]);
+const META_LABELS = new Set(["document", "available", "missing", "entity"]);
 
 function nodeToData(node: Record<string, unknown>, labels?: string[]): NodeData {
   const props = node as Record<string, unknown>;

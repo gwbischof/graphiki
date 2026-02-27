@@ -35,6 +35,27 @@
       "subtypes": {},
       "defaultColor": "#5b9aff"
     },
+    "person": {
+      "shape": "ellipse",
+      "sizeMultiplier": 0.7,
+      "subtypeField": null,
+      "subtypes": {},
+      "defaultColor": "#ff6b8a"
+    },
+    "organization": {
+      "shape": "diamond",
+      "sizeMultiplier": 0.6,
+      "subtypeField": null,
+      "subtypes": {},
+      "defaultColor": "#56d364"
+    },
+    "location": {
+      "shape": "hexagon",
+      "sizeMultiplier": 0.6,
+      "subtypeField": null,
+      "subtypes": {},
+      "defaultColor": "#ff8c42"
+    },
     "Location": {
       "shape": "hexagon",
       "sizeMultiplier": 0.85,
@@ -55,7 +76,9 @@
     "DOCUMENT":      { "color": "#ffb847", "label": "Document" },
     "AFFILIATION":   { "color": "#8b95b5", "label": "Affiliation" },
     "OWNERSHIP":     { "color": "#c4a0ff", "label": "Ownership" },
-    "SUMMARY":       { "color": "#e0af68", "label": "Summary" }
+    "SUMMARY":       { "color": "#e0af68", "label": "Summary" },
+    "REFERENCES":    { "color": "#7aa2f7", "label": "References" },
+    "MENTIONS":      { "color": "#bb9af7", "label": "Mentions" }
   },
   "statusStyles": {
     "convicted":           { "color": "red",    "label": "Convicted" },
