@@ -322,20 +322,33 @@ export async function executeViewQuery(
 
 // ── All nodes (homepage) ──
 
-export async function getAllNodes(perTypeLimit = 50000): Promise<CytoscapeElement[]> {
+export async function getAllNodes(
+  perTypeLimit = 50000,
+  nodeTypeConfig?: Record<string, unknown>
+): Promise<CytoscapeElement[]> {
   if (!isNeo4jAvailable()) return [];
-  // Get distinct node labels, then query each type with its own limit
-  // so no single type dominates the results
-  const labelRecords = await runQuery(
-    "CALL db.labels() YIELD label RETURN label"
-  );
-  const skipLabels = new Set(["efta", "available", "missing", "View", "Community"]);
-  const nodeLabels = labelRecords
-    .map(r => String((r as unknown as Neo4jRecord).get("label")))
-    .filter(l => !skipLabels.has(l));
+
+  // Query each configured node type with its own limit so no single type dominates
+  let typeLabels: string[];
+  if (nodeTypeConfig) {
+    typeLabels = Object.keys(nodeTypeConfig);
+  } else {
+    // Fallback: query all labels except meta/internal ones
+    const labelRecords = await runQuery("CALL db.labels() YIELD label RETURN label");
+    const skipLabels = new Set([
+      "efta", "available", "missing", "View", "Community",
+      // entity_ref secondary labels (covered by entity_ref query)
+      "person", "company", "nickname", "email", "phone",
+      "address", "place", "vehicle", "property", "tail_number",
+      "account", "username",
+    ]);
+    typeLabels = labelRecords
+      .map(r => String((r as unknown as Neo4jRecord).get("label")))
+      .filter(l => !skipLabels.has(l));
+  }
 
   const allRecords = (await Promise.all(
-    nodeLabels.map(l =>
+    typeLabels.map(l =>
       runQuery(
         `MATCH (n:\`${l}\`) RETURN n.id AS id, n.label AS label, n.name AS name,
          n.node_type AS node_type, n.dataset AS dataset, n.doc_count AS doc_count,
