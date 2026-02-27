@@ -49,10 +49,18 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const labelStr = labels.map((l: string) => `:${l}`).join("");
+  // First label is the type label used for MERGE (stable identity).
+  // Remaining labels are SET after (e.g. document, available/missing).
+  const mergeLabel = labels[0];
+  const setLabels = labels.slice(1);
+  const setLabelStr = setLabels.length > 0
+    ? `SET d${setLabels.map((l: string) => `:${l}`).join("")}`
+    : "";
+
   const cypher = `
     UNWIND $nodes AS n
-    MERGE (d${labelStr} {${merge_key}: n.${merge_key}})
+    MERGE (d:${mergeLabel} {${merge_key}: n.${merge_key}})
+    ${setLabelStr}
     SET d += n
     RETURN count(d) AS merged
   `;
