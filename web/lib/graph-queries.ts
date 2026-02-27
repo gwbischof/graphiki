@@ -322,18 +322,37 @@ export async function executeViewQuery(
 
 // ── All nodes (homepage) ──
 
-export async function getAllNodes(limit = 100000): Promise<CytoscapeElement[]> {
+export async function getAllNodes(perTypeLimit = 50000): Promise<CytoscapeElement[]> {
   if (!isNeo4jAvailable()) return [];
-  // Skip efta document nodes on homepage (1.4M nodes too many to render).
-  // They're still reachable via search and neighborhood queries.
-  const records = await runQuery(
-    `MATCH (n) WHERE NOT n:efta
-     RETURN n.id AS id, n.label AS label, n.name AS name,
-     n.node_type AS node_type, n.dataset AS dataset, n.doc_count AS doc_count,
-     labels(n) AS labels
-     LIMIT $limit`,
-    { limit }
+  // Get distinct node labels, then query each type with its own limit
+  // so no single type dominates the results
+  const labelRecords = await runQuery(
+    "CALL db.labels() YIELD label RETURN label"
   );
+  const skipLabels = new Set(["efta", "available", "missing", "View", "Community"]);
+  const nodeLabels = labelRecords
+    .map(r => String((r as unknown as Neo4jRecord).get("label")))
+    .filter(l => !skipLabels.has(l));
+
+  const allRecords = (await Promise.all(
+    nodeLabels.map(l =>
+      runQuery(
+        `MATCH (n:\`${l}\`) RETURN n.id AS id, n.label AS label, n.name AS name,
+         n.node_type AS node_type, n.dataset AS dataset, n.doc_count AS doc_count,
+         labels(n) AS labels LIMIT $limit`,
+        { limit: perTypeLimit }
+      )
+    )
+  )).flat();
+
+  // Deduplicate nodes that appear under multiple labels
+  const seen = new Set<string>();
+  const records = allRecords.filter(rec => {
+    const id = String((rec as unknown as Neo4jRecord).get("id"));
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
   return records.map(rec => {
     const r = rec as unknown as Neo4jRecord;
     const props: Record<string, unknown> = {
