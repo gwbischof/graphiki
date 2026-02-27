@@ -10,6 +10,39 @@ import type { NodeData } from "@/lib/graph-data";
 import type { GraphConfig } from "@/lib/graph-config";
 import { getNodeColor, getStatusStyle } from "@/lib/graph-config";
 
+// Properties handled elsewhere in the panel (header badges, notes section, etc.)
+const HIDDEN_PROPS = new Set([
+  "label", "node_type", "status", "notes", "doc_count",
+  "x", "y", "section",
+]);
+
+function formatValue(value: unknown): string {
+  if (typeof value === "number") return value.toLocaleString();
+  return String(value);
+}
+
+function PropertyRow({ label, value }: { label: string; value: unknown }) {
+  const display = formatValue(value);
+  const isUrl = typeof value === "string" && value.startsWith("http");
+  return (
+    <>
+      <span className="text-muted-foreground whitespace-nowrap">{label}</span>
+      {isUrl ? (
+        <a
+          href={display}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-[11px] truncate text-blue-400 hover:underline"
+        >
+          {display}
+        </a>
+      ) : (
+        <span className="font-mono text-[11px] truncate">{display}</span>
+      )}
+    </>
+  );
+}
+
 interface DetailPanelProps {
   node: NodeData | null;
   onClose: () => void;
@@ -106,22 +139,16 @@ export function DetailPanel({ node, onClose, onProposeEdit, onAddConnection, con
                   Properties
                 </div>
                 <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-xs">
-                  <span className="text-muted-foreground">ID</span>
-                  <span className="font-mono text-[11px] truncate">{node.id}</span>
-                  {node.doc_count > 0 && (
-                    <>
-                      <span className="text-muted-foreground">Documents</span>
-                      <span className="font-mono text-[11px]">
-                        {node.doc_count.toLocaleString()}
-                      </span>
-                    </>
-                  )}
-                  {node.network && (
-                    <>
-                      <span className="text-muted-foreground">Network</span>
-                      <span className="text-[11px]">{node.network}</span>
-                    </>
-                  )}
+                  {Object.entries(node)
+                    .filter(([key, value]) =>
+                      value != null &&
+                      value !== "" &&
+                      !HIDDEN_PROPS.has(key)
+                    )
+                    .map(([key, value]) => (
+                      <PropertyRow key={key} label={key} value={value} />
+                    ))
+                  }
                 </div>
               </div>
 
