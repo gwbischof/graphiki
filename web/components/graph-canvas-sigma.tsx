@@ -127,7 +127,7 @@ export function GraphCanvas({
     graph.forEachNode((id, attrs) => {
       const nodeType = attrs.node_type as string;
       const ntConfig = config.nodeTypes[nodeType];
-      if (ntConfig) {
+      if (ntConfig && Object.keys(ntConfig.subtypes).length > 0) {
         const subtypeField = ntConfig.subtypeField;
         const subtypeValue = attrs[subtypeField] as string;
         const activeSet = activeSubtypes.get(nodeType);
