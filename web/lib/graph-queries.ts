@@ -322,13 +322,28 @@ export async function executeViewQuery(
 
 // ── All nodes (homepage) ──
 
-export async function getAllNodes(limit = 50000): Promise<CytoscapeElement[]> {
+export async function getAllNodes(limit = 2000000): Promise<CytoscapeElement[]> {
   if (!isNeo4jAvailable()) return [];
-  const records = await runQuery("MATCH (n) RETURN n LIMIT $limit", { limit });
+  // Return only the fields needed for rendering to keep payload small
+  const records = await runQuery(
+    `MATCH (n) RETURN n.id AS id, n.label AS label, n.name AS name,
+     n.node_type AS node_type, n.dataset AS dataset, n.doc_count AS doc_count,
+     labels(n) AS labels
+     LIMIT $limit`,
+    { limit }
+  );
   return records.map(rec => {
     const r = rec as unknown as Neo4jRecord;
-    const node = r.get("n");
-    return { group: "nodes" as const, data: nodeToData(node.properties, node.labels) };
+    const props: Record<string, unknown> = {
+      id: r.get("id"),
+      label: r.get("label"),
+      name: r.get("name"),
+      node_type: r.get("node_type"),
+      dataset: r.get("dataset"),
+      doc_count: r.get("doc_count"),
+    };
+    const labels = r.get("labels") as string[] | undefined;
+    return { group: "nodes" as const, data: nodeToData(props, labels) };
   });
 }
 

@@ -26,4 +26,5 @@ RUN chmod +x ./start.sh
 USER nextjs
 EXPOSE 3001
 ENV PORT=3001
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 CMD ["./start.sh"]
