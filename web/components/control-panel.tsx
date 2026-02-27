@@ -15,6 +15,8 @@ import type { CytoscapeElement, NodeData, EdgeData } from "@/lib/graph-data";
 interface ControlPanelProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  activeNodeTypes: Set<string>;
+  onToggleNodeType: (nodeType: string) => void;
   activeSubtypes: Map<string, Set<string>>;
   onToggleSubtype: (nodeType: string, subtype: string) => void;
   activeEdgeTypes: Set<string>;
@@ -40,6 +42,8 @@ function formatLabel(key: string) {
 export function ControlPanel({
   searchQuery,
   onSearchChange,
+  activeNodeTypes,
+  onToggleNodeType,
   activeSubtypes,
   onToggleSubtype,
   activeEdgeTypes,
@@ -124,17 +128,73 @@ export function ControlPanel({
             <span>{edgeCount} edges</span>
           </div>
 
-          {/* Node type filter sections — only for types present in data */}
+          {/* Node type filters — only for types present in data */}
+          {presentNodeTypes.size > 0 && (
+            <div>
+              <button
+                onClick={() => toggle("nodeTypes")}
+                className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2 hover:text-foreground transition-colors w-full"
+              >
+                {(openSections.nodeTypes ?? true) ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+                Node Types
+              </button>
+              <AnimatePresence>
+                {(openSections.nodeTypes ?? true) && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-1">
+                      {Object.entries(config.nodeTypes)
+                        .filter(([typeName]) => presentNodeTypes.has(typeName))
+                        .map(([typeName, ntConfig]) => {
+                          const nodeTypeCount = localElements?.filter(
+                            (e) => e.group === "nodes" && (e.data as NodeData).node_type === typeName
+                          ).length ?? 0;
+
+                          return (
+                            <label
+                              key={typeName}
+                              className="flex items-center gap-2 py-1 px-1 rounded-md hover:bg-white/[0.03] cursor-pointer group transition-colors"
+                            >
+                              <Checkbox
+                                checked={activeNodeTypes.has(typeName)}
+                                onCheckedChange={() => onToggleNodeType(typeName)}
+                                className="size-3.5"
+                              />
+                              <span
+                                className="size-2 rounded-full shrink-0"
+                                style={{ backgroundColor: ntConfig.defaultColor }}
+                              />
+                              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">
+                                {formatLabel(typeName)}
+                              </span>
+                              <span className="text-[9px] font-mono text-muted-foreground/50 ml-auto">
+                                {nodeTypeCount.toLocaleString()}
+                              </span>
+                            </label>
+                          );
+                        })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Subtype filters — only for types with subtypes present in data */}
           {Object.entries(config.nodeTypes)
             .filter(([typeName, ntConfig]) =>
-              presentNodeTypes.has(typeName) && Object.keys(ntConfig.subtypes).length > 0
+              presentNodeTypes.has(typeName) && Object.keys(ntConfig.subtypes).length > 0 && (presentSubtypes.get(typeName)?.size ?? 0) > 0
             )
             .map(([typeName, ntConfig]) => {
               const isOpen = openSections[typeName] ?? true;
               const activeSet = activeSubtypes.get(typeName) || new Set();
               const existingSubtypes = presentSubtypes.get(typeName);
 
-              // Only show subtypes that exist in the data
               const visibleSubtypes = Object.entries(ntConfig.subtypes).filter(
                 ([key]) => !existingSubtypes || existingSubtypes.has(key)
               );
@@ -147,7 +207,7 @@ export function ControlPanel({
                     className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2 hover:text-foreground transition-colors w-full"
                   >
                     {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
-                    {typeName} Types
+                    {typeName} Subtypes
                   </button>
                   <AnimatePresence>
                     {isOpen && (

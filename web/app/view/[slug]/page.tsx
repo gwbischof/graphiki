@@ -27,6 +27,7 @@ export default function ViewPage({ params }: { params: Promise<{ slug: string }>
   const [view, setView] = useState<SavedView | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
+  const [activeNodeTypes, setActiveNodeTypes] = useState<Set<string>>(new Set());
   const [activeSubtypes, setActiveSubtypes] = useState<Map<string, Set<string>>>(new Map());
   const [activeEdgeTypes, setActiveEdgeTypes] = useState<Set<string>>(new Set());
 
@@ -45,6 +46,7 @@ export default function ViewPage({ params }: { params: Promise<{ slug: string }>
         for (const [typeName, ntConfig] of Object.entries(cfg.nodeTypes)) {
           subtypes.set(typeName, new Set(Object.keys(ntConfig.subtypes)));
         }
+        setActiveNodeTypes(new Set(Object.keys(cfg.nodeTypes)));
         setActiveSubtypes(subtypes);
         setActiveEdgeTypes(new Set(Object.keys(cfg.edgeTypes)));
         setLoading(false);
@@ -95,6 +97,7 @@ export default function ViewPage({ params }: { params: Promise<{ slug: string }>
         <GraphCanvas
           elements={elements}
           searchQuery=""
+          activeNodeTypes={activeNodeTypes}
           activeSubtypes={activeSubtypes}
           activeEdgeTypes={activeEdgeTypes}
           onNodeSelect={handleNodeSelect}

@@ -19,6 +19,7 @@ import {
 interface GraphCanvasSigmaProps {
   elements: CytoscapeElement[];
   searchQuery: string;
+  activeNodeTypes: Set<string>;
   activeSubtypes: Map<string, Set<string>>;
   activeEdgeTypes: Set<string>;
   onNodeSelect: (node: NodeData | null) => void;
@@ -30,6 +31,7 @@ interface GraphCanvasSigmaProps {
 export function GraphCanvas({
   elements,
   searchQuery,
+  activeNodeTypes,
   activeSubtypes,
   activeEdgeTypes,
   onNodeSelect,
@@ -53,10 +55,13 @@ export function GraphCanvas({
     });
 
     if (!hasPositions) {
-      // Assign random initial positions
+      // Assign random initial positions in a spherical projection (circle)
+      const R = 500;
       g.forEachNode((id) => {
-        g.setNodeAttribute(id, "x", Math.random() * 1000);
-        g.setNodeAttribute(id, "y", Math.random() * 1000);
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.acos(2 * Math.random() - 1);
+        g.setNodeAttribute(id, "x", R * Math.sin(phi) * Math.cos(theta));
+        g.setNodeAttribute(id, "y", R * Math.sin(phi) * Math.sin(theta));
       });
 
       // Run ForceAtlas2 for layout (synchronous, fine for <5K nodes)
@@ -126,6 +131,14 @@ export function GraphCanvas({
     const filtered = new Set<string>();
     graph.forEachNode((id, attrs) => {
       const nodeType = attrs.node_type as string;
+
+      // Filter by node type
+      if (!activeNodeTypes.has(nodeType)) {
+        filtered.add(id);
+        return;
+      }
+
+      // Filter by subtype (only for types that have subtypes configured)
       const ntConfig = config.nodeTypes[nodeType];
       if (ntConfig && Object.keys(ntConfig.subtypes).length > 0) {
         const subtypeField = ntConfig.subtypeField;
@@ -137,7 +150,7 @@ export function GraphCanvas({
       }
     });
     return filtered;
-  }, [graph, activeSubtypes, config]);
+  }, [graph, activeNodeTypes, activeSubtypes, config]);
 
   const filteredOutEdges = useMemo(() => {
     const filtered = new Set<string>();

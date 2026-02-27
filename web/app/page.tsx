@@ -59,6 +59,7 @@ export default function Home() {
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeNodeTypes, setActiveNodeTypes] = useState<Set<string>>(new Set());
   const [activeSubtypes, setActiveSubtypes] = useState<Map<string, Set<string>>>(new Map());
   const [activeEdgeTypes, setActiveEdgeTypes] = useState<Set<string>>(new Set());
 
@@ -77,6 +78,7 @@ export default function Home() {
     loadGraphConfig()
       .then((cfg) => {
         setConfig(cfg);
+        setActiveNodeTypes(new Set(Object.keys(cfg.nodeTypes)));
         setActiveSubtypes(buildAllSubtypes(cfg));
         setActiveEdgeTypes(new Set(Object.keys(cfg.edgeTypes)));
       })
@@ -141,6 +143,15 @@ export default function Home() {
     [graphView]
   );
 
+  const handleToggleNodeType = useCallback((nodeType: string) => {
+    setActiveNodeTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeType)) next.delete(nodeType);
+      else next.add(nodeType);
+      return next;
+    });
+  }, []);
+
   const handleToggleSubtype = useCallback((nodeType: string, subtype: string) => {
     setActiveSubtypes((prev) => {
       const next = new Map(prev);
@@ -168,6 +179,7 @@ export default function Home() {
   const handleReset = useCallback(() => {
     if (!config) return;
     setSearchQuery("");
+    setActiveNodeTypes(new Set(Object.keys(config.nodeTypes)));
     setActiveSubtypes(buildAllSubtypes(config));
     setActiveEdgeTypes(new Set(Object.keys(config.edgeTypes)));
     setSelectedNode(null);
@@ -304,6 +316,7 @@ export default function Home() {
         <GraphCanvas
           elements={graphView.elements}
           searchQuery={searchQuery}
+          activeNodeTypes={activeNodeTypes}
           activeSubtypes={activeSubtypes}
           activeEdgeTypes={activeEdgeTypes}
           onNodeSelect={handleNodeSelect}
@@ -328,6 +341,8 @@ export default function Home() {
         <ControlPanel
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          activeNodeTypes={activeNodeTypes}
+          onToggleNodeType={handleToggleNodeType}
           activeSubtypes={activeSubtypes}
           onToggleSubtype={handleToggleSubtype}
           activeEdgeTypes={activeEdgeTypes}
