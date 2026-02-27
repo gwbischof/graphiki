@@ -8,8 +8,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchPanel } from "@/components/search-panel";
 import { PathFinder } from "@/components/path-finder";
+import { useMemo } from "react";
 import type { GraphConfig } from "@/lib/graph-config";
-import type { CytoscapeElement } from "@/lib/graph-data";
+import type { CytoscapeElement, NodeData, EdgeData } from "@/lib/graph-data";
 
 interface ControlPanelProps {
   searchQuery: string;
@@ -53,6 +54,37 @@ export function ControlPanel({
   onExpandNode,
   onPathFound,
 }: ControlPanelProps) {
+  // Compute which node types, subtypes, and edge types exist in the data
+  const { presentNodeTypes, presentSubtypes, presentEdgeTypes } = useMemo(() => {
+    const nodeTypes = new Set<string>();
+    const subtypes = new Map<string, Set<string>>();
+    const edgeTypes = new Set<string>();
+
+    if (localElements) {
+      for (const el of localElements) {
+        if (el.group === "nodes") {
+          const d = el.data as NodeData;
+          const nt = d.node_type;
+          if (nt) nodeTypes.add(nt);
+          const ntConfig = config.nodeTypes[nt];
+          if (ntConfig?.subtypeField) {
+            const sv = d[ntConfig.subtypeField] as string;
+            if (sv) {
+              let s = subtypes.get(nt);
+              if (!s) { s = new Set(); subtypes.set(nt, s); }
+              s.add(sv);
+            }
+          }
+        } else {
+          const d = el.data as EdgeData;
+          if (d.edge_type) edgeTypes.add(d.edge_type);
+        }
+      }
+    }
+
+    return { presentNodeTypes: nodeTypes, presentSubtypes: subtypes, presentEdgeTypes: edgeTypes };
+  }, [localElements, config]);
+
   // Track open/closed state per section
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = { edges: true, pathfinder: false };
@@ -92,59 +124,70 @@ export function ControlPanel({
             <span>{edgeCount} edges</span>
           </div>
 
-          {/* Node type filter sections — one per config nodeType */}
-          {Object.entries(config.nodeTypes).map(([typeName, ntConfig]) => {
-            const isOpen = openSections[typeName] ?? true;
-            const activeSet = activeSubtypes.get(typeName) || new Set();
+          {/* Node type filter sections — only for types present in data */}
+          {Object.entries(config.nodeTypes)
+            .filter(([typeName, ntConfig]) =>
+              presentNodeTypes.has(typeName) && Object.keys(ntConfig.subtypes).length > 0
+            )
+            .map(([typeName, ntConfig]) => {
+              const isOpen = openSections[typeName] ?? true;
+              const activeSet = activeSubtypes.get(typeName) || new Set();
+              const existingSubtypes = presentSubtypes.get(typeName);
 
-            return (
-              <div key={typeName}>
-                <button
-                  onClick={() => toggle(typeName)}
-                  className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2 hover:text-foreground transition-colors w-full"
-                >
-                  {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
-                  {typeName} Types
-                </button>
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="space-y-1">
-                        {Object.entries(ntConfig.subtypes).map(([key, style]) => (
-                          <label
-                            key={key}
-                            className="flex items-center gap-2 py-1 px-1 rounded-md hover:bg-white/[0.03] cursor-pointer group transition-colors"
-                          >
-                            <Checkbox
-                              checked={activeSet.has(key)}
-                              onCheckedChange={() => onToggleSubtype(typeName, key)}
-                              className="size-3.5"
-                            />
-                            <span
-                              className="size-2 rounded-full shrink-0"
-                              style={{ backgroundColor: style.color }}
-                            />
-                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">
-                              {style.label || formatLabel(key)}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+              // Only show subtypes that exist in the data
+              const visibleSubtypes = Object.entries(ntConfig.subtypes).filter(
+                ([key]) => !existingSubtypes || existingSubtypes.has(key)
+              );
+              if (visibleSubtypes.length === 0) return null;
 
-          {/* Edge Type Filters */}
-          <div>
+              return (
+                <div key={typeName}>
+                  <button
+                    onClick={() => toggle(typeName)}
+                    className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2 hover:text-foreground transition-colors w-full"
+                  >
+                    {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+                    {typeName} Types
+                  </button>
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="space-y-1">
+                          {visibleSubtypes.map(([key, style]) => (
+                            <label
+                              key={key}
+                              className="flex items-center gap-2 py-1 px-1 rounded-md hover:bg-white/[0.03] cursor-pointer group transition-colors"
+                            >
+                              <Checkbox
+                                checked={activeSet.has(key)}
+                                onCheckedChange={() => onToggleSubtype(typeName, key)}
+                                className="size-3.5"
+                              />
+                              <span
+                                className="size-2 rounded-full shrink-0"
+                                style={{ backgroundColor: style.color }}
+                              />
+                              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">
+                                {style.label || formatLabel(key)}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+
+          {/* Edge Type Filters — only when edges exist */}
+          {presentEdgeTypes.size > 0 && <div>
             <button
               onClick={() => toggle("edges")}
               className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2 hover:text-foreground transition-colors w-full"
@@ -162,30 +205,32 @@ export function ControlPanel({
                   className="overflow-hidden"
                 >
                   <div className="space-y-1">
-                    {Object.entries(config.edgeTypes).map(([key, etConfig]) => (
-                      <label
-                        key={key}
-                        className="flex items-center gap-2 py-1 px-1 rounded-md hover:bg-white/[0.03] cursor-pointer group transition-colors"
-                      >
-                        <Checkbox
-                          checked={activeEdgeTypes.has(key)}
-                          onCheckedChange={() => onToggleEdgeType(key)}
-                          className="size-3.5"
-                        />
-                        <span
-                          className="size-2 rounded-full shrink-0"
-                          style={{ backgroundColor: etConfig.color }}
-                        />
-                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                          {etConfig.label || formatLabel(key)}
-                        </span>
-                      </label>
-                    ))}
+                    {Object.entries(config.edgeTypes)
+                      .filter(([key]) => presentEdgeTypes.has(key))
+                      .map(([key, etConfig]) => (
+                        <label
+                          key={key}
+                          className="flex items-center gap-2 py-1 px-1 rounded-md hover:bg-white/[0.03] cursor-pointer group transition-colors"
+                        >
+                          <Checkbox
+                            checked={activeEdgeTypes.has(key)}
+                            onCheckedChange={() => onToggleEdgeType(key)}
+                            className="size-3.5"
+                          />
+                          <span
+                            className="size-2 rounded-full shrink-0"
+                            style={{ backgroundColor: etConfig.color }}
+                          />
+                          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                            {etConfig.label || formatLabel(key)}
+                          </span>
+                        </label>
+                      ))}
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div>}
 
           {/* Path Finder (collapsible) */}
           <div>

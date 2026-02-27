@@ -337,6 +337,7 @@ export default function Home() {
           nodeCount={nodeCount}
           edgeCount={edgeCount}
           config={config}
+          localElements={graphView.elements}
         />
       )}
 
@@ -360,7 +361,7 @@ export default function Home() {
       />
 
       {/* Legend (bottom) */}
-      {!isLoading && config && <GraphLegend config={config} />}
+      {!isLoading && config && <GraphLegend config={config} elements={graphView.elements} />}
 
       {/* Save View Dialog */}
       <SaveViewDialog
