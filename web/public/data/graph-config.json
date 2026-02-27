@@ -35,26 +35,12 @@
       "subtypes": {},
       "defaultColor": "#5b9aff"
     },
-    "person": {
+    "entity_ref": {
       "shape": "ellipse",
-      "sizeMultiplier": 0.7,
-      "subtypeField": null,
-      "subtypes": {},
-      "defaultColor": "#ff6b8a"
-    },
-    "organization": {
-      "shape": "diamond",
       "sizeMultiplier": 0.6,
       "subtypeField": null,
       "subtypes": {},
-      "defaultColor": "#56d364"
-    },
-    "location": {
-      "shape": "hexagon",
-      "sizeMultiplier": 0.6,
-      "subtypeField": null,
-      "subtypes": {},
-      "defaultColor": "#ff8c42"
+      "defaultColor": "#bb9af7"
     },
     "Location": {
       "shape": "hexagon",
