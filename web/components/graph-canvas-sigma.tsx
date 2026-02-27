@@ -55,46 +55,14 @@ export function GraphCanvas({
     });
 
     if (!hasPositions) {
-      // Group nodes by a grouping attribute (e.g. dataset) for clustered layout
-      const groups = new Map<string, string[]>();
-      g.forEachNode((id, attrs) => {
-        const key = String(attrs.dataset ?? attrs.node_type ?? "default");
-        let list = groups.get(key);
-        if (!list) { list = []; groups.set(key, list); }
-        list.push(id);
+      // Distribute all nodes in a single sphere
+      const R = 500;
+      g.forEachNode((id) => {
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.acos(2 * Math.random() - 1);
+        g.setNodeAttribute(id, "x", R * Math.sin(phi) * Math.cos(theta));
+        g.setNodeAttribute(id, "y", R * Math.sin(phi) * Math.sin(theta));
       });
-
-      if (groups.size > 1) {
-        // Arrange each group as a sphere, with spheres placed in a ring
-        const sortedGroups = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
-        const ringRadius = 200 + sortedGroups.length * 80;
-
-        sortedGroups.forEach(([, nodeIds], i) => {
-          // Position this group's center on a ring
-          const angle = (i / sortedGroups.length) * 2 * Math.PI;
-          const cx = ringRadius * Math.cos(angle);
-          const cy = ringRadius * Math.sin(angle);
-
-          // Sphere radius proportional to sqrt of node count
-          const r = Math.max(40, Math.sqrt(nodeIds.length) * 3);
-
-          for (const id of nodeIds) {
-            const theta = Math.random() * 2 * Math.PI;
-            const phi = Math.acos(2 * Math.random() - 1);
-            g.setNodeAttribute(id, "x", cx + r * Math.sin(phi) * Math.cos(theta));
-            g.setNodeAttribute(id, "y", cy + r * Math.sin(phi) * Math.sin(theta));
-          }
-        });
-      } else {
-        // Single group: one sphere
-        const R = 500;
-        g.forEachNode((id) => {
-          const theta = Math.random() * 2 * Math.PI;
-          const phi = Math.acos(2 * Math.random() - 1);
-          g.setNodeAttribute(id, "x", R * Math.sin(phi) * Math.cos(theta));
-          g.setNodeAttribute(id, "y", R * Math.sin(phi) * Math.sin(theta));
-        });
-      }
 
       // Run ForceAtlas2 for layout (synchronous, fine for <5K nodes)
       if (g.order > 0 && g.order < 5000) {

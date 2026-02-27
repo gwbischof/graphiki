@@ -322,7 +322,7 @@ export async function executeViewQuery(
 
 // ── All nodes (homepage) ──
 
-export async function getAllNodes(limit = 2000000): Promise<CytoscapeElement[]> {
+export async function getAllNodes(limit = 100000): Promise<CytoscapeElement[]> {
   if (!isNeo4jAvailable()) return [];
   // Return only the fields needed for rendering to keep payload small
   const records = await runQuery(

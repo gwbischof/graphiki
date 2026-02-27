@@ -6,9 +6,9 @@ import type { GraphConfig } from "./graph-config";
 
 // Map doc_count to node size (log scale, pixel-based)
 function docCountToSize(count: number, multiplier = 1): number {
-  if (count <= 0) return 3;
-  const s = Math.log10(count + 1) * 2;
-  return Math.max(3, Math.min(10, s * multiplier));
+  if (count <= 0) return 1.5;
+  const s = Math.log10(count + 1) * 1.5;
+  return Math.max(1.5, Math.min(6, s * multiplier));
 }
 
 // Map config shapes to Sigma node types
