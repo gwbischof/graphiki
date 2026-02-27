@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { proposals, auditLog } from "@/lib/db/schema";
 import { requireRole } from "@/lib/auth-guard";
+import { requireAdmin } from "@/lib/admin-auth";
 import {
   applyProposal,
   getNodeState,
@@ -9,8 +10,14 @@ import {
 } from "@/lib/graph-mutations";
 
 export async function POST(request: NextRequest) {
+  // Direct-edit needs a user identity for audit trail.
+  // Allow admin key to bypass role check, but still try to resolve user.
   const { user, error } = await requireRole("admin");
-  if (error) return error;
+  if (error) {
+    // No valid session/Bearer — check admin key as fallback
+    const { error: adminError } = await requireAdmin(request);
+    if (adminError) return error;
+  }
 
   const body = await request.json();
   const { type, targetNodeId, targetEdgeId, dataAfter, reason } = body;
@@ -30,6 +37,8 @@ export async function POST(request: NextRequest) {
     dataBefore = await getEdgeState(targetEdgeId);
   }
 
+  const userId = user?.id ?? "admin-key";
+
   // Create auto-approved proposal
   const [row] = await db
     .insert(proposals)
@@ -41,14 +50,14 @@ export async function POST(request: NextRequest) {
       dataBefore,
       dataAfter: dataAfter || {},
       reason,
-      authorId: user!.id,
-      reviewerId: user!.id,
+      authorId: userId,
+      reviewerId: userId,
       reviewedAt: new Date(),
     })
     .returning();
 
   // Apply immediately
-  const result = await applyProposal(row, user!.id);
+  const result = await applyProposal(row, userId);
 
   // Write direct-edit audit entry
   const actionMap: Record<string, string> = {
@@ -63,7 +72,7 @@ export async function POST(request: NextRequest) {
   await db.insert(auditLog).values({
     action: (actionMap[type] || "direct_edit_node") as typeof auditLog.$inferInsert.action,
     proposalId: row.id,
-    userId: user!.id,
+    userId,
     targetNodeId: row.targetNodeId,
     targetEdgeId: row.targetEdgeId,
     dataBefore,

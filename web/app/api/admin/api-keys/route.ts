@@ -3,10 +3,11 @@ import { randomBytes, createHash } from "crypto";
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { apiKeys, users } from "@/lib/db/schema";
+import { requireAdmin } from "@/lib/admin-auth";
 import { requireRole } from "@/lib/auth-guard";
 
-export async function GET() {
-  const { error } = await requireRole("admin");
+export async function GET(request: NextRequest) {
+  const { error } = await requireAdmin(request);
   if (error) return error;
 
   const rows = await db
@@ -29,8 +30,13 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { error } = await requireRole("admin");
-  if (error) return error;
+  // POST needs user identity to assign key ownership — use role-based auth,
+  // with admin key as fallback
+  const { user, error } = await requireRole("admin");
+  if (error) {
+    const { error: adminError } = await requireAdmin(request);
+    if (adminError) return error;
+  }
 
   const body = await request.json();
   const { name, userId, expiresAt } = body;
@@ -43,13 +49,13 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify user exists
-  const [user] = await db
+  const [targetUser] = await db
     .select({ id: users.id })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
 
-  if (!user) {
+  if (!targetUser) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 

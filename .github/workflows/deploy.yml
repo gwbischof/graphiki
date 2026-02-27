@@ -146,6 +146,7 @@ jobs:
               -e NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
               -e GITHUB_ID="${{ secrets.OAUTH_GITHUB_ID }}" \
               -e GITHUB_SECRET="${{ secrets.OAUTH_GITHUB_SECRET }}" \
+              -e GRAPHONI_ADMIN_KEY="${{ secrets.GRAPHONI_ADMIN_KEY }}" \
               -l "traefik.enable=true" \
               -l "traefik.http.routers.graphoni.rule=Host(\`$DOMAIN\`)" \
               -l "traefik.http.routers.graphoni.tls=true" \

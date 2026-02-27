@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { requireRole } from "@/lib/auth-guard";
+import { requireAdmin } from "@/lib/admin-auth";
 
-export async function GET() {
-  const { error } = await requireRole("admin");
+export async function GET(request: NextRequest) {
+  const { error } = await requireAdmin(request);
   if (error) return error;
 
   const rows = await db

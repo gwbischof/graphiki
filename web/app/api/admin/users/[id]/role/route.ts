@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { requireRole } from "@/lib/auth-guard";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { error } = await requireRole("admin");
+  const { error } = await requireAdmin(request);
   if (error) return error;
 
   const body = await request.json();

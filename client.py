@@ -38,11 +38,13 @@ class GraphoniClient:
         self,
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,
+        admin_key: Optional[str] = None,
     ):
         self.base_url = (
             base_url or os.environ.get("GRAPHONI_URL", "http://localhost:3001")
         ).rstrip("/")
         self.api_key = api_key or os.environ.get("GRAPHONI_API_KEY")
+        self.admin_key = admin_key or os.environ.get("GRAPHONI_ADMIN_KEY")
         self.session = requests.Session()
         if self.api_key:
             self.session.headers["Authorization"] = f"Bearer {self.api_key}"
@@ -232,6 +234,69 @@ class GraphoniClient:
             f"/api/proposals/{proposal_id}",
             {"status": "rejected", "reviewComment": comment},
         )
+
+    # ── Bulk admin methods (X-API-Key auth) ──
+
+    def _bulk_post(self, path: str, body: dict) -> dict:
+        """POST with X-API-Key header for bulk admin endpoints."""
+        headers = {}
+        if self.admin_key:
+            headers["X-API-Key"] = self.admin_key
+        url = f"{self.base_url}{path}"
+        resp = self.session.post(url, json=body, headers=headers)
+        if not resp.ok:
+            try:
+                detail = resp.json().get("error", resp.text)
+            except Exception:
+                detail = resp.text
+            raise GraphoniError(resp.status_code, detail)
+        return resp.json()
+
+    def bulk_merge_nodes(
+        self,
+        label: str,
+        nodes: list[dict],
+        merge_key: str,
+        batch_size: int = 1000,
+    ) -> int:
+        """Bulk MERGE nodes via /api/admin/bulk-nodes. Returns total merged count."""
+        total = 0
+        for i in range(0, len(nodes), batch_size):
+            batch = nodes[i : i + batch_size]
+            data = self._bulk_post(
+                "/api/admin/bulk-nodes",
+                {"label": label, "nodes": batch, "merge_key": merge_key},
+            )
+            total += data.get("merged", 0)
+        return total
+
+    def bulk_merge_edges(
+        self,
+        edge_type: str,
+        source_label: str,
+        target_label: str,
+        edges: list[dict],
+        source_key: str = "efta_id",
+        target_key: str = "id",
+        batch_size: int = 1000,
+    ) -> int:
+        """Bulk MERGE edges via /api/admin/bulk-edges. Returns total created count."""
+        total = 0
+        for i in range(0, len(edges), batch_size):
+            batch = edges[i : i + batch_size]
+            data = self._bulk_post(
+                "/api/admin/bulk-edges",
+                {
+                    "edge_type": edge_type,
+                    "source_label": source_label,
+                    "target_label": target_label,
+                    "edges": batch,
+                    "source_key": source_key,
+                    "target_key": target_key,
+                },
+            )
+            total += data.get("created", 0)
+        return total
 
     # ── Other ──
 
