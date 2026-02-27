@@ -24,11 +24,11 @@ function nodeToData(node: Record<string, unknown>, labels?: string[]): NodeData 
     nodeType = labels.find(l => !META_LABELS.has(l)) || "Unknown";
   }
   return {
+    ...props,
     id: String(props.id || ""),
     label: String(props.label || props.name || props.id || ""),
     node_type: nodeType || "Unknown",
     doc_count: toNumber(props.doc_count),
-    ...props,
   } as NodeData;
 }
 
