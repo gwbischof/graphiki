@@ -81,20 +81,28 @@ jobs:
 
             # --- Ensure infrastructure services are running ---
 
-            # Start Neo4j if not running
-            if ! docker ps --format "table {{.Names}}" | grep -q "^graphoni-neo4j$"; then
-              echo "Starting Neo4j..."
+            # Ensure Neo4j is running with correct config
+            NEO4J_CONFIG_HASH=$(echo -n "neo4j/${{ secrets.NEO4J_PASSWORD }}|7687:7687|keep_none|apoc" | sha256sum | cut -c1-12)
+            RUNNING_HASH=$(docker inspect --format '{{index .Config.Labels "config.hash"}}' graphoni-neo4j 2>/dev/null || echo "")
+            if [ "$NEO4J_CONFIG_HASH" != "$RUNNING_HASH" ]; then
+              echo "Neo4j config changed (${RUNNING_HASH:-none} -> $NEO4J_CONFIG_HASH), recreating..."
+              docker stop graphoni-neo4j 2>/dev/null || true
               docker rm graphoni-neo4j 2>/dev/null || true
               docker run -d \
                 --name graphoni-neo4j \
                 --restart unless-stopped \
                 --network "$NETWORK" \
-                -e NEO4J_AUTH=none \
+                -p 7687:7687 \
+                -v neo4j-data:/data \
+                -e NEO4J_AUTH=neo4j/${{ secrets.NEO4J_PASSWORD }} \
+                -e NEO4J_db_tx__log_rotation_retention__policy=keep_none \
+                -e NEO4J_PLUGINS='["apoc"]' \
+                -l "config.hash=$NEO4J_CONFIG_HASH" \
                 neo4j:5-community
               echo "Waiting for Neo4j to be ready..."
               sleep 10
             else
-              echo "Neo4j already running"
+              echo "Neo4j already running with correct config"
             fi
 
             # Start Postgres if not running
@@ -142,6 +150,7 @@ jobs:
               --network "$NETWORK" \
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
               -e NEO4J_URI="bolt://graphoni-neo4j:7687" \
+              -e NEO4J_PASSWORD="${{ secrets.NEO4J_PASSWORD }}" \
               -e NEXTAUTH_URL="https://$DOMAIN" \
               -e NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
               -e GITHUB_ID="${{ secrets.OAUTH_GITHUB_ID }}" \

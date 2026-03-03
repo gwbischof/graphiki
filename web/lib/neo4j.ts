@@ -10,7 +10,7 @@ export function getDriver(): Driver | null {
   if (!uri) return null;
 
   if (!driver) {
-    driver = neo4j.driver(uri, neo4j.auth.basic("", ""), {
+    driver = neo4j.driver(uri, neo4j.auth.basic("neo4j", process.env.NEO4J_PASSWORD || ""), {
       maxConnectionPoolSize: 50,
       connectionAcquisitionTimeout: 30000,
       maxTransactionRetryTime: 15000,

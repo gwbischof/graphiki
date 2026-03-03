@@ -4,14 +4,19 @@
 
 services:
   neo4j:
+    container_name: graphoni-neo4j
     image: neo4j:5-community
     environment:
-      NEO4J_AUTH: none
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
+      NEO4J_db_tx__log_rotation_retention__policy: keep_none
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7687:7687"
     volumes:
       - neo4j-data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "cypher-shell", "-a", "bolt://localhost:7687", "RETURN 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
