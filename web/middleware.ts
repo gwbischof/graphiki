@@ -13,6 +13,9 @@ import { NextRequest, NextResponse } from "next/server";
  */
 
 const GRAPHONI_API_KEY = process.env.GRAPHONI_API_KEY;
+const APP_ORIGIN = process.env.NEXTAUTH_URL
+  ? new URL(process.env.NEXTAUTH_URL).origin
+  : null;
 
 function isPublicRoute(pathname: string): boolean {
   if (pathname === "/api/health") return true;
@@ -40,10 +43,9 @@ export function middleware(request: NextRequest) {
 
   // Same-origin requests (browser frontend) pass through
   const referer = request.headers.get("referer");
-  if (referer) {
-    const refererUrl = new URL(referer);
-    const requestUrl = request.nextUrl;
-    if (refererUrl.origin === requestUrl.origin) {
+  if (referer && APP_ORIGIN) {
+    const refererOrigin = new URL(referer).origin;
+    if (refererOrigin === APP_ORIGIN) {
       return NextResponse.next();
     }
   }
