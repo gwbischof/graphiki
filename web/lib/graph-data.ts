@@ -97,8 +97,10 @@ export interface SavedView {
 
 // ── Data loading ──
 
+import { apiUrl } from "@/lib/api";
+
 export async function loadGraphData(): Promise<GraphData> {
-  const res = await fetch("/api/graph");
+  const res = await fetch(apiUrl("/api/graph"));
   if (!res.ok) throw new Error("Failed to load graph data");
   return res.json();
 }

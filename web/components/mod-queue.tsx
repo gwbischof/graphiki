@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { apiUrl } from "@/lib/api";
 
 interface ApiProposal {
   id: string;
@@ -90,7 +91,7 @@ export function ModQueue({ open, onOpenChange }: ModQueueProps) {
   const fetchProposals = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/proposals?limit=100");
+      const res = await fetch(apiUrl("/api/proposals?limit=100"));
       if (res.ok) {
         const data = await res.json();
         setProposals(data.proposals);
@@ -124,7 +125,7 @@ export function ModQueue({ open, onOpenChange }: ModQueueProps) {
   async function handleAction(id: string, status: "approved" | "rejected") {
     setActionLoading(id);
     try {
-      const res = await fetch(`/api/proposals/${id}`, {
+      const res = await fetch(apiUrl(`/api/proposals/${id}`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),

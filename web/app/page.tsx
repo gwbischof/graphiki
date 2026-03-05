@@ -30,6 +30,7 @@ import type { NodeData, EdgeData } from "@/lib/graph-data";
 import type { GraphConfig } from "@/lib/graph-config";
 import { loadGraphConfig } from "@/lib/graph-config";
 import { useGraphView } from "@/hooks/use-graph-view";
+import { apiUrl } from "@/lib/api";
 
 /** Build a Map<nodeType, Set<subtypeKey>> with all subtypes active */
 function buildAllSubtypes(config: GraphConfig): Map<string, Set<string>> {
@@ -88,7 +89,7 @@ export default function Home() {
   // Fetch pending count when authenticated
   useEffect(() => {
     if (!session?.user) return;
-    fetch("/api/proposals?status=pending&limit=1")
+    fetch(apiUrl("/api/proposals?status=pending&limit=1"))
       .then((r) => r.json())
       .then((data) => setPendingCount(data.proposals?.length ?? 0))
       .catch(() => {});
@@ -204,7 +205,7 @@ export default function Home() {
     async (name: string, description: string) => {
       const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       try {
-        await fetch("/api/views", {
+        await fetch(apiUrl("/api/views"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -410,7 +411,7 @@ export default function Home() {
           setModQueueOpen(open);
           // Refresh pending count when closing
           if (!open && session?.user) {
-            fetch("/api/proposals?status=pending&limit=1")
+            fetch(apiUrl("/api/proposals?status=pending&limit=1"))
               .then((r) => r.json())
               .then((data) => setPendingCount(data.proposals?.length ?? 0))
               .catch(() => {});

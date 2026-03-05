@@ -8,6 +8,7 @@ import {
   type BreadcrumbItem,
 } from "@/lib/graph-view-state";
 import { loadGraphData } from "@/lib/graph-data";
+import { apiUrl } from "@/lib/api";
 
 export function useGraphView() {
   const [state, dispatch] = useReducer(viewReducer, null, createInitialViewState);
@@ -47,7 +48,7 @@ export function useGraphView() {
       dispatch({ type: "SET_LOADING", loading: true });
 
       try {
-        const res = await fetch(`/api/graph/community/${encodeURIComponent(communityId)}`);
+        const res = await fetch(apiUrl(`/api/graph/community/${encodeURIComponent(communityId)}`));
         if (res.ok) {
           const data = await res.json();
           dispatch({ type: "EXPAND_COMMUNITY", communityId, children: data.elements });
@@ -74,7 +75,7 @@ export function useGraphView() {
       if (index === 0) {
         // Back to overview
         try {
-          const res = await fetch("/api/graph/communities?level=0");
+          const res = await fetch(apiUrl("/api/graph/communities?level=0"));
           if (res.ok) {
             const data = await res.json();
             dispatch({ type: "SET_ELEMENTS", elements: data.elements });
@@ -96,7 +97,7 @@ export function useGraphView() {
       dispatch({ type: "SET_ACTIVE_VIEW", view: slug });
 
       try {
-        const res = await fetch(`/api/views/${encodeURIComponent(slug)}?results=true`);
+        const res = await fetch(apiUrl(`/api/views/${encodeURIComponent(slug)}?results=true`));
         if (res.ok) {
           const data = await res.json();
           dispatch({
@@ -120,7 +121,7 @@ export function useGraphView() {
 
       try {
         const res = await fetch(
-          `/api/graph/node/${encodeURIComponent(nodeId)}?hops=${hops}&limit=100`
+          apiUrl(`/api/graph/node/${encodeURIComponent(nodeId)}?hops=${hops}&limit=100`)
         );
         if (res.ok) {
           const data = await res.json();
@@ -140,7 +141,7 @@ export function useGraphView() {
     async (nodeId: string, hops = 1) => {
       try {
         const res = await fetch(
-          `/api/graph/node/${encodeURIComponent(nodeId)}?hops=${hops}&limit=100`
+          apiUrl(`/api/graph/node/${encodeURIComponent(nodeId)}?hops=${hops}&limit=100`)
         );
         if (res.ok) {
           const data = await res.json();

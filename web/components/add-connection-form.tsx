@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { NodeData } from "@/lib/graph-data";
+import { apiUrl } from "@/lib/api";
 import type { GraphConfig } from "@/lib/graph-config";
 import { getNodeColor } from "@/lib/graph-config";
 
@@ -108,7 +109,7 @@ export function AddConnectionForm({
     if (quote.trim()) dataAfter.quote = quote.trim();
 
     try {
-      const res = await fetch("/api/proposals", {
+      const res = await fetch(apiUrl("/api/proposals"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

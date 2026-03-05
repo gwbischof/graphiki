@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import type { CytoscapeElement, NodeData, SavedView } from "@/lib/graph-data";
 import type { GraphConfig } from "@/lib/graph-config";
 import { loadGraphConfig } from "@/lib/graph-config";
+import { apiUrl } from "@/lib/api";
 
 export default function ViewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -34,7 +35,7 @@ export default function ViewPage({ params }: { params: Promise<{ slug: string }>
   useEffect(() => {
     Promise.all([
       loadGraphConfig(),
-      fetch(`/api/views/${encodeURIComponent(slug)}?results=true`).then((r) => r.json()),
+      fetch(apiUrl(`/api/views/${encodeURIComponent(slug)}?results=true`)).then((r) => r.json()),
     ])
       .then(([cfg, data]) => {
         setConfig(cfg);

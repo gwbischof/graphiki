@@ -6,6 +6,7 @@ import { Route, Loader2, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { CytoscapeElement, NodeData } from "@/lib/graph-data";
+import { apiUrl } from "@/lib/api";
 
 interface PathFinderProps {
   onPathFound: (elements: CytoscapeElement[]) => void;
@@ -27,7 +28,7 @@ export function PathFinder({ onPathFound }: PathFinderProps) {
 
     try {
       const res = await fetch(
-        `/api/graph/path?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`
+        apiUrl(`/api/graph/path?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`)
       );
       const data = await res.json();
 

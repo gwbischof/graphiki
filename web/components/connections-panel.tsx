@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import type { NodeData, EdgeData } from "@/lib/graph-data";
 import type { GraphConfig } from "@/lib/graph-config";
 import { getEdgeColor } from "@/lib/graph-config";
+import { apiUrl } from "@/lib/api";
 
 interface ConnectionsPanelProps {
   edge: EdgeData | null;
@@ -125,7 +126,7 @@ function SummaryEditDialog({
     setError(null);
 
     try {
-      const res = await fetch("/api/proposals", {
+      const res = await fetch(apiUrl("/api/proposals"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

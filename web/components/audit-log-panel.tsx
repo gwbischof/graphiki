@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { apiUrl } from "@/lib/api";
 
 interface AuditEntry {
   id: string;
@@ -66,7 +67,7 @@ export function AuditLogPanel({ open, onOpenChange }: AuditLogPanelProps) {
     try {
       const params = new URLSearchParams({ limit: "100" });
       if (filterNodeId) params.set("targetNodeId", filterNodeId);
-      const res = await fetch(`/api/audit?${params}`);
+      const res = await fetch(apiUrl(`/api/audit?${params}`));
       if (res.ok) {
         const data = await res.json();
         setEntries(data.entries);
@@ -89,7 +90,7 @@ export function AuditLogPanel({ open, onOpenChange }: AuditLogPanelProps) {
     const summary = prompt("Enter squash summary:");
     if (!summary) return;
 
-    const res = await fetch("/api/audit/squash", {
+    const res = await fetch(apiUrl("/api/audit/squash"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ targetNodeId: filterNodeId, summary }),

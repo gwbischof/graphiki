@@ -59,8 +59,10 @@ export interface GraphConfig {
   searchConfig?: SearchConfig;
 }
 
+import { apiUrl } from "@/lib/api";
+
 export async function loadGraphConfig(): Promise<GraphConfig> {
-  const res = await fetch("/data/graph-config.json");
+  const res = await fetch(apiUrl("/data/graph-config.json"));
   if (!res.ok) throw new Error("Failed to load graph config");
   return res.json();
 }

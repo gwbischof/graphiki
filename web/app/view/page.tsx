@@ -6,13 +6,14 @@ import { Bookmark, ArrowLeft, Users, GitBranch } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { SavedView } from "@/lib/graph-data";
+import { apiUrl } from "@/lib/api";
 
 export default function ViewsGallery() {
   const [views, setViews] = useState<SavedView[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/views")
+    fetch(apiUrl("/api/views"))
       .then((res) => res.json())
       .then((data) => {
         setViews(data.views || []);

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { CytoscapeElement, NodeData } from "@/lib/graph-data";
+import { apiUrl } from "@/lib/api";
 
 interface SearchResult {
   id: string;
@@ -37,7 +38,7 @@ export function useSearch(localElements?: CytoscapeElement[]): UseSearchReturn {
 
       // Try API first
       try {
-        const res = await fetch(`/api/graph/search?q=${encodeURIComponent(q)}&limit=20`);
+        const res = await fetch(apiUrl(`/api/graph/search?q=${encodeURIComponent(q)}&limit=20`));
         if (res.ok) {
           const data = await res.json();
           const searchResults: SearchResult[] = (data.results || []).map(

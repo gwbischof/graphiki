@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { NodeData } from "@/lib/graph-data";
+import { apiUrl } from "@/lib/api";
 
 interface ProposalFormProps {
   open: boolean;
@@ -47,7 +48,7 @@ export function ProposalForm({ open, onOpenChange, node }: ProposalFormProps) {
     }
 
     try {
-      const res = await fetch("/api/proposals", {
+      const res = await fetch(apiUrl("/api/proposals"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
