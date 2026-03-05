@@ -49,6 +49,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GRAPHONI_BASE_PATH=${{ secrets.GRAPHONI_BASE_PATH }}
 
       - name: Output image
         id: image
@@ -73,6 +75,7 @@ jobs:
             IMAGE_NAME="${{ needs.build-and-push.outputs.image }}"
             NETWORK="${{ secrets.DOCKER_NETWORK || 'root_default' }}"
             DOMAIN="${{ secrets.DEPLOY_DOMAIN || 'graphoni.korroni.cloud' }}"
+            BASE_PATH="${{ secrets.GRAPHONI_BASE_PATH }}"
 
             echo "Starting deployment of Graphoni..."
 
@@ -151,7 +154,7 @@ jobs:
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
               -e NEO4J_URI="bolt://graphoni-neo4j:7687" \
               -e NEO4J_PASSWORD="${{ secrets.NEO4J_PASSWORD }}" \
-              -e NEXTAUTH_URL="https://$DOMAIN" \
+              -e NEXTAUTH_URL="https://$DOMAIN$BASE_PATH" \
               -e NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
               -e GITHUB_ID="${{ secrets.OAUTH_GITHUB_ID }}" \
               -e GITHUB_SECRET="${{ secrets.OAUTH_GITHUB_SECRET }}" \
@@ -172,7 +175,7 @@ jobs:
             if docker ps --format "table {{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
               echo "Container is running!"
 
-              if curl -f -s https://"$DOMAIN"/api/health > /dev/null 2>&1; then
+              if curl -f -s https://"$DOMAIN""$BASE_PATH"/api/health > /dev/null 2>&1; then
                 echo "Health check passed!"
               else
                 echo "Health check failed, but container is running"
@@ -190,4 +193,4 @@ jobs:
             docker image prune -af
 
             echo "Deployment completed!"
-            echo "Application available at: https://$DOMAIN"
+            echo "Application available at: https://$DOMAIN$BASE_PATH"

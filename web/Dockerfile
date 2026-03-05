@@ -7,6 +7,8 @@ RUN npm ci
 
 FROM base AS builder
 WORKDIR /app
+ARG GRAPHONI_BASE_PATH=""
+ENV GRAPHONI_BASE_PATH=$GRAPHONI_BASE_PATH
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
