@@ -38,6 +38,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Same-origin requests (browser frontend) pass through
+  const referer = request.headers.get("referer");
+  if (referer) {
+    const refererUrl = new URL(referer);
+    const requestUrl = request.nextUrl;
+    if (refererUrl.origin === requestUrl.origin) {
+      return NextResponse.next();
+    }
+  }
+
   // Check X-API-Key header
   const xApiKey = request.headers.get("x-api-key");
   if (xApiKey === GRAPHONI_API_KEY) {
