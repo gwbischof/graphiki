@@ -48,6 +48,7 @@ class GraphoniClient:
         self.session = requests.Session()
         if self.api_key:
             self.session.headers["Authorization"] = f"Bearer {self.api_key}"
+            self.session.headers["X-API-Key"] = self.api_key
 
     def _request(self, method: str, path: str, **kwargs) -> dict:
         url = f"{self.base_url}{path}"
